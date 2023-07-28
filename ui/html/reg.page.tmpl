@@ -1,0 +1,108 @@
+{{template "base" .}}
+
+{{define "main"}}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+    }
+
+    .registration-container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 40px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .registration-container h2 {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .registration-container input[type="text"],
+    .registration-container input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    .registration-container input[type="submit"] {
+        width: 100%;
+        padding: 10px;
+        background-color: #4CAF50;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .registration-container input[type="submit"]:hover {
+        background-color: #45a049;
+    }
+
+    .registration-container p {
+        text-align: center;
+        margin-top: 20px;
+    }
+</style>
+<div class="registration-container">
+    <h1>Регистрация</h1>
+    <form id="registrationForm" action="/reg" method="post" onsubmit="return validateForm()">
+        <div>
+            <label for="name">Имя:</label>
+            <input type="text" id="name" name="name" maxlength="50" required>
+        </div>
+        <div>
+            <label for="login">Логин:</label>
+            <input type="text" id="login" name="login" pattern="[A-Za-z0-9_-]+" required>
+            <span class="error" id="loginError"></span>
+        </div>
+        <div>
+            <label for="password">Пароль:</label>
+            <input type="password" id="password" name="password" minlength="8" required>
+        </div>
+        <div>
+            <label for="confirmPassword">Подтвердите пароль:</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" minlength="8" required>
+            <span class="error" id="passwordError"></span>
+        </div>
+        <div>
+            <input type="submit" value="Зарегистрироваться">
+        </div>
+    </form>
+</div>
+<script>
+    function validateForm() {
+        var login = document.getElementById('login').value;
+        var password = document.getElementById('password').value;
+        var confirmPassword = document.getElementById('confirmPassword').value;
+        var loginPattern = /^[A-Za-z0-9_-]+$/;
+
+        // Проверка логина
+        if (!loginPattern.test(login)) {
+            document.getElementById('loginError').innerText = "Логин может содержать только английские буквы, цифры, нижнее подчеркивание и тире.";
+            return false;
+        } else {
+            document.getElementById('loginError').innerText = "";
+        }
+
+        // Проверка пароля
+        if (password.length < 8) {
+            document.getElementById('passwordError').innerText = "Пароль должен содержать минимум 8 символов.";
+            return false;
+        } else if (password !== confirmPassword) {
+            document.getElementById('passwordError').innerText = "Пароли не совпадают.";
+            return false;
+        } else {
+            document.getElementById('passwordError').innerText = "";
+        }
+
+        return true;
+    }
+</script>
+{{end}}

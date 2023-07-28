@@ -1,0 +1,17 @@
+{{template "base" .}}
+
+{{define "main"}}
+    <style>
+        .center {
+            text-align: center;
+        }
+    </style>
+<div class="center">
+    <h1>Мы рады приветствовать вас!</h1>
+    {{ if .LoginInfo }}
+    <p>Вы вошли как: {{.LoginInfo}}</p>
+    {{ else }}
+    <p>Вы не вошли в систему.</p>
+    {{ end }}
+</div>
+{{end}}
