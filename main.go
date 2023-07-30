@@ -23,7 +23,7 @@ func main() {
 	}
 
 	dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s TimeZone=%s",
-		os.Getenv("USER"),
+		os.Getenv("USERNAME"),
 		os.Getenv("PASSWORD"),
 		os.Getenv("DBNAME"),
 		os.Getenv("HOST"),
