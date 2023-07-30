@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"site/auth"
+	"site/database"
 	"time"
 )
 
@@ -26,7 +27,6 @@ func MainHandler(c echo.Context) error {
 	if err == nil {
 		username, err = auth.VerifyAndExtractUsername(cookie.Value)
 	}
-	// Создаем экземпляр шаблонизатора
 
 	// Данные для передачи в шаблон
 	data := map[string]interface{}{
@@ -46,12 +46,22 @@ func ChatTemplateHandler(c echo.Context) error {
 	cookie, err := c.Cookie("token")
 	if err == nil {
 		username, err = auth.VerifyAndExtractUsername(cookie.Value)
+		if err != nil {
+			log.Error(err.Error())
+			return c.Redirect(http.StatusFound, "/logout")
+		}
+	} else {
+		return c.Redirect(http.StatusFound, "/login")
+	}
+	logins, err := database.GetDb().GetAllLogins()
+	if err != nil {
+		log.Error(err.Error())
 	}
 	data := map[string]interface{}{
 		"title":     "Чат",
 		"LoginInfo": username,
 		"chatId":    "ws://" + c.Request().Host + "/chat_s",
-		"strings":   []string{"Привет", "Hello", "Hola", "Bonjour"},
+		"logins":    logins,
 	}
 
 	err = renderBase(c, "chat.page.tmpl", data)

@@ -47,12 +47,11 @@
 
 <div class = "chat_body">
     <div class="sidebar">
+        {{range .logins}}
         <div class="user_lnk">
-            <a href="#">Вася</a>
+            <a href="#">{{.}}</a>
         </div>
-        <div class="user_lnk">
-            <a href="#">Вова</a>
-        </div>
+        {{end}}
     </div>
     <div class="active_zone">
         <div id="message_list" class="message_list">
@@ -79,6 +78,10 @@
     const input = document.getElementById("chat_input");
     const output = document.getElementById("message_list");
     let ws;
+    let single_message = {
+        "message": "",
+        "user_to": "",
+    }
 
     const print = function (message) {
         const d = document.createElement("div");
