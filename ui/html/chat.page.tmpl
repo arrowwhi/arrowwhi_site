@@ -77,15 +77,37 @@
 <script>
     const input = document.getElementById("chat_input");
     const output = document.getElementById("message_list");
+    let message_to = "0";
     let ws;
     let single_message = {
         "message": "",
-        "user_to": "",
+        "user_to": message_to,
     }
 
-    const print = function (message) {
-        const d = document.createElement("div");
-        d.textContent = message;
+    // Функция для создания структуры тегов
+    function createMessage(author, messageText) {
+        const messageDiv = document.createElement("div");
+        messageDiv.classList.add("message");
+
+        const strongElement = document.createElement("strong");
+        const authorLink = document.createElement("a");
+        authorLink.href = "#user";
+        authorLink.textContent = author;
+        strongElement.appendChild(authorLink);
+
+        const spanElement = document.createElement("span");
+        spanElement.textContent = messageText;
+
+        messageDiv.appendChild(strongElement);
+        messageDiv.appendChild(spanElement);
+
+        return messageDiv;
+    }
+
+    const print = function (author, message) {
+        // const d = document.createElement("div");
+        // d.textContent = message;
+        const d = createMessage(author, message)
         output.appendChild(d);
         output.scroll(0, output.scrollHeight);
     };
@@ -96,17 +118,18 @@
         }
         ws = new WebSocket("{{.chatId}}");
         ws.onopen = function(evt) {
-            print("OPEN");
+            print("","OPEN");
         }
         ws.onclose = function(evt) {
-            print("CLOSE");
+            print("","CLOSE");
             ws = null;
         }
         ws.onmessage = function(evt) {
-            print("RESPONSE: " + evt.data);
+            const struct = JSON.parse(evt.data);
+            print(struct.user_from + ": ", struct.message);
         }
         ws.onerror = function(evt) {
-            print("ERROR: " + evt.data);
+            print("","ERROR: " + evt.data);
         }
         return false;
     });
@@ -115,8 +138,9 @@
         if (!ws) {
             return false;
         }
-        print("SEND: " + input.value);
-        ws.send(input.value);
+        single_message.message = input.value;
+        print("","SEND: " + JSON.stringify(single_message));
+        ws.send(JSON.stringify(single_message));
         return false;
     };
 
