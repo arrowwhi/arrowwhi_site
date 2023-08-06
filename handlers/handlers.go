@@ -53,7 +53,7 @@ func ChatTemplateHandler(c echo.Context) error {
 	} else {
 		return c.Redirect(http.StatusFound, "/login")
 	}
-	logins, err := database.GetDb().GetAllLogins()
+	logins, err := database.Get().GetAllLogins()
 	if err != nil {
 		log.Error(err.Error())
 	}

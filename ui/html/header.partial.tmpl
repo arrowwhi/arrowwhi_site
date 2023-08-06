@@ -21,6 +21,7 @@
     </div>
     <div>
       {{ if .LoginInfo }}
+        Вы зашли как <a href="#">{{.LoginInfo}}</a>.
       <a href="/logout">Выйти</a>
       {{ else }}
       <a href="/login">Войти</a>

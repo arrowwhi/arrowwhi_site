@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/gommon/log"
 	"net/http"
 	"site/database"
 	"time"
@@ -79,13 +78,15 @@ func TakeAuthHandler(c echo.Context) error {
 
 	username := c.FormValue("username")
 	pass := c.FormValue("password")
-
-	client, err := database.GetDb().SelectClientByLogin(username)
-	if err != nil || client.Password != pass {
-		log.Error(err)
+	client, err := database.Get().SelectClientByLogin(username)
+	if err != nil {
 		return c.String(http.StatusForbidden, err.Error())
 	}
-	fmt.Println(client.Name)
+
+	if client == nil || client.Password != pass {
+		return c.String(http.StatusForbidden, "неправильный логин или пароль")
+
+	}
 
 	// Создаем JWT токен
 	tokenString, err := createToken(username)
@@ -107,7 +108,7 @@ func TakeRegHandler(c echo.Context) error {
 	login := c.FormValue("login")
 	pass := c.FormValue("password")
 	// TODO validate fields
-	_, err := database.GetDb().AddClient(name, login, pass)
+	_, err := database.Get().AddClient(name, login, pass)
 	if err != nil {
 		return c.String(http.StatusServiceUnavailable, err.Error())
 	}

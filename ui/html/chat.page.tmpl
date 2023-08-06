@@ -6,16 +6,30 @@
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
+        flex: 1;
+
     }
 
     .chat_body {
         display: flex;
+        /*margin-bottom: 20px;*/
+        flex: auto;
 
+    }
+
+    .active_zone {
+        display: flex;
+        border: 2px solid #000; /* Толщина рамки и ее стиль */
+        border-radius: 10px; /* Радиус закругления углов */
+        padding: 10px; /* Добавляем отступы вокруг содержимого */
+        flex-direction: column;
+        justify-content: space-between;
+        width: 100vh;
     }
 
     .sidebar {
         background-color: #f2f2f2;
-        height: 100vh;
+        height:85vh;
         width: 150px;
         padding: 10px;
         overflow-y: auto;
@@ -26,14 +40,20 @@
 
     .message_list {
         display: flex;
+        overflow: auto;
         flex-direction: column;
         align-items: flex-start;
-        height: 300px; /* Укажите высоту контейнера, чтобы было видно эффект */
+        height: 200px;
     }
 
     .input_zone {
         display: flex;
+        width: 100vh;
 
+    }
+
+    .login_click {
+        color: #cccccc;
     }
 
     .user_lnk {
@@ -43,32 +63,29 @@
         background-color: #4CAF50;
         color: white;
     }
+
+    .chat_input {
+        width: 80vh;
+
+    }
 </style>
 
 <div class = "chat_body">
     <div class="sidebar">
         {{range .logins}}
         <div class="user_lnk">
-            <a href="#">{{.}}</a>
+            <a href="#" class="login_click">{{.}}</a>
         </div>
         {{end}}
     </div>
     <div class="active_zone">
         <div id="message_list" class="message_list">
-            <div class="message">
-                <strong><a href="#user">Вася</a>:</strong>
-                <span>Фсем чмоке ф этам чяте</span>
-            </div>
-            <div class="message">
-                <strong><a href="#user">Вова</a>:</strong>
-                <span>Я идиот убейте меня кто-нибудь</span>
-            </div>
-<!--            ...-->
+
         </div>
         <div class="input_zone">
             <label for="chat_input">
-                <input type="text" class="chat_input" id="chat_input" placeholder="вводить текст сюда" />
-                <input id="send" type="submit" />
+                <input type="text" class="chat_input" id="chat_input" placeholder="вводить текст сюда" onkeydown="checkEnter(event)" />
+                <input id="send" type="submit" onclick="press_send(event)" />
             </label>
         </div>
     </div>
@@ -77,11 +94,17 @@
 <script>
     const input = document.getElementById("chat_input");
     const output = document.getElementById("message_list");
-    let message_to = "0";
     let ws;
+
     let single_message = {
+        "m_type": "message",
         "message": "",
-        "user_to": message_to,
+        "recipient": "",
+    }
+
+    let dl_messages = {
+        "m_type": "dl_messages",
+        "user": ""
     }
 
     // Функция для создания структуры тегов
@@ -104,47 +127,120 @@
         return messageDiv;
     }
 
+    // функция для печати сообщений снизу
     const print = function (author, message) {
-        // const d = document.createElement("div");
-        // d.textContent = message;
         const d = createMessage(author, message)
         output.appendChild(d);
         output.scroll(0, output.scrollHeight);
     };
 
-    document.addEventListener('DOMContentLoaded', function(evt) {
+    // функция для печати сообщений сверху
+    const print_forward = function (author, message) {
+        const d = createMessage(author, message);
+        output.prepend(d);
+        output.scroll(0, output.scrollHeight);
+    };
+
+    // функция создания вебсокета
+    document.addEventListener('DOMContentLoaded', function() {
         if (ws) {
             return false;
         }
         ws = new WebSocket("{{.chatId}}");
-        ws.onopen = function(evt) {
-            print("","OPEN");
+        ws.onopen = function() {
+            console.log("OPEN")
         }
-        ws.onclose = function(evt) {
-            print("","CLOSE");
+        ws.onclose = function() {
+            console.log("CLOSE");
             ws = null;
         }
         ws.onmessage = function(evt) {
             const struct = JSON.parse(evt.data);
-            print(struct.user_from + ": ", struct.message);
+            console.log(evt.data)
+            if (struct.from === single_message.recipient) {
+                print(`${struct.from}:`, " " + struct.message);
+            } else {
+                console.log(struct.from, struct.message)
+            }
         }
         ws.onerror = function(evt) {
-            print("","ERROR: " + evt.data);
+            console.log("ERROR: " + evt.data);
         }
         return false;
     });
 
-    document.getElementById("send").onclick = function(evt) {
+    //проверка евента на нажатую клаишу enter           - ?
+    function checkEnter(evt) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            press_send(evt)
+        }
+    }
+
+    // отправка сообщения на сервер
+    function press_send() {
         if (!ws) {
             return false;
         }
         single_message.message = input.value;
-        print("","SEND: " + JSON.stringify(single_message));
+        print(single_message.recipient, input.value)
+        console.log("SEND: " + JSON.stringify(single_message));
         ws.send(JSON.stringify(single_message));
+        input.value = ''
         return false;
-    };
+    }
+
+
+    function take_messages(usr) {
+        const url = "/database/get_messages"
+        const data = {
+            username: usr,
+            lastId: 0,
+            count: 10
+        };
+        console.log(data)
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' // Заголовок для указания типа данных JSON
+            },
+            body: JSON.stringify(data) // Преобразование данных в JSON и отправка в теле запроса
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Обработка полученных данных
+                for (let elem of data.messages) {
+                    print_forward(elem.user_from, elem.message)
+                }
+            })
+            .catch(error => console.error('Ошибка:', error));
+
+    }
+
+
+    function handleLoginClick(event, clickedElement) {
+        event.preventDefault();
+        const link = event.target;
+        single_message.recipient = link.textContent;
+
+        take_messages(link.textContent)
+        const allLinks = document.querySelectorAll('.user_lnk');
+        for (let i = 0; i < allLinks.length; i++) {
+            allLinks[i].style.backgroundColor = "#4CAF50";
+        }
+
+        const divElement = clickedElement.parentNode;
+        divElement.style.backgroundColor = 'blue';
+    }
+
+    const links = document.querySelectorAll(".login_click");
+    links.forEach((link) => {
+        link.addEventListener("click", function(event) {
+            event.preventDefault();
+            handleLoginClick(event, this);
+        });
+    });
 
 </script>
-
 
 {{end}}
