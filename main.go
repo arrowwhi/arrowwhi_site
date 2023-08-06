@@ -53,6 +53,7 @@ func main() {
 	e.GET("/logout", handlers.LogoutHandler)
 	e.GET("/chat_s", chat.ChatHandler)
 	e.POST("/database/get_messages", handlers.GetMessagesHistory)
+	e.POST("/feedback/add", handlers.TakeFeedback)
 
 	e.Logger.Fatal(e.Start(os.Getenv("STANDARTPORT")))
 
