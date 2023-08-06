@@ -26,14 +26,19 @@
 
     .message_list {
         display: flex;
+        overflow: auto;
         flex-direction: column;
         align-items: flex-start;
-        height: 300px; /* Укажите высоту контейнера, чтобы было видно эффект */
+        height: 300px;
     }
 
     .input_zone {
         display: flex;
 
+    }
+
+    .login_click {
+        color: #cccccc;
     }
 
     .user_lnk {
@@ -49,26 +54,18 @@
     <div class="sidebar">
         {{range .logins}}
         <div class="user_lnk">
-            <a href="#">{{.}}</a>
+            <a href="#" class="login_click">{{.}}</a>
         </div>
         {{end}}
     </div>
     <div class="active_zone">
         <div id="message_list" class="message_list">
-            <div class="message">
-                <strong><a href="#user">Вася</a>:</strong>
-                <span>Фсем чмоке ф этам чяте</span>
-            </div>
-            <div class="message">
-                <strong><a href="#user">Вова</a>:</strong>
-                <span>Я идиот убейте меня кто-нибудь</span>
-            </div>
-<!--            ...-->
+
         </div>
         <div class="input_zone">
             <label for="chat_input">
-                <input type="text" class="chat_input" id="chat_input" placeholder="вводить текст сюда" />
-                <input id="send" type="submit" />
+                <input type="text" class="chat_input" id="chat_input" placeholder="вводить текст сюда" onkeydown="checkEnter(event)" />
+                <input id="send" type="submit" onclick="press_send(event)" />
             </label>
         </div>
     </div>
@@ -77,11 +74,11 @@
 <script>
     const input = document.getElementById("chat_input");
     const output = document.getElementById("message_list");
-    let message_to = "0";
     let ws;
     let single_message = {
+        "m_type": "message",
         "message": "",
-        "user_to": message_to,
+        "recipient": "",
     }
 
     // Функция для создания структуры тегов
@@ -105,8 +102,6 @@
     }
 
     const print = function (author, message) {
-        // const d = document.createElement("div");
-        // d.textContent = message;
         const d = createMessage(author, message)
         output.appendChild(d);
         output.scroll(0, output.scrollHeight);
@@ -118,31 +113,65 @@
         }
         ws = new WebSocket("{{.chatId}}");
         ws.onopen = function(evt) {
-            print("","OPEN");
+            console.log("OPEN")
         }
         ws.onclose = function(evt) {
-            print("","CLOSE");
+            console.log("CLOSE");
             ws = null;
         }
         ws.onmessage = function(evt) {
             const struct = JSON.parse(evt.data);
-            print(struct.user_from + ": ", struct.message);
+            console.log(evt.data)
+            if (struct.from === single_message.recipient) {
+                print(`${struct.from}:`, " " + struct.message);
+            } else {
+                console.log(struct.from, struct.message)
+            }
         }
         ws.onerror = function(evt) {
-            print("","ERROR: " + evt.data);
+            console.log("ERROR: " + evt.data);
         }
         return false;
     });
 
-    document.getElementById("send").onclick = function(evt) {
+    function checkEnter(evt) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            press_send(evt)
+        }
+    }
+
+    function press_send(evt) {
         if (!ws) {
             return false;
         }
         single_message.message = input.value;
-        print("","SEND: " + JSON.stringify(single_message));
+        console.log("SEND: " + JSON.stringify(single_message));
         ws.send(JSON.stringify(single_message));
         return false;
-    };
+    }
+
+
+    function handleLoginClick(event, clickedElement) {
+        event.preventDefault();
+        const link = event.target;
+        single_message.recipient = link.textContent;
+        const allLinks = document.querySelectorAll('.user_lnk');
+        for (let i = 0; i < allLinks.length; i++) {
+            allLinks[i].style.backgroundColor = "#4CAF50";
+        }
+
+        const divElement = clickedElement.parentNode;
+        divElement.style.backgroundColor = 'blue';
+    }
+
+    const links = document.querySelectorAll(".login_click");
+    links.forEach((link) => {
+        link.addEventListener("click", function(event) {
+            event.preventDefault();
+            handleLoginClick(event, this);
+        });
+    });
 
 </script>
 

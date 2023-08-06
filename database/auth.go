@@ -11,7 +11,7 @@ type Client struct {
 	CreateDate time.Time `gorm:"default:CURRENT_TIMESTAMP"`
 }
 
-func (dbe *dbEngine) SelectClientByLogin(login string) (*Client, error) {
+func (dbe *DbEngine) SelectClientByLogin(login string) (*Client, error) {
 	var client Client
 	if err := dbe.db.Where("login = ?", login).First(&client).Error; err != nil {
 		return nil, err
@@ -19,11 +19,11 @@ func (dbe *dbEngine) SelectClientByLogin(login string) (*Client, error) {
 	return &client, nil
 }
 
-func (dbe *dbEngine) UpdateClientPassword(login string, newPass string) error {
+func (dbe *DbEngine) UpdateClientPassword(login string, newPass string) error {
 	return dbe.db.Model(&Client{}).Where("login = ?", login).Update("password", newPass).Error
 }
 
-func (dbe *dbEngine) AddClient(name, login, password string) (*Client, error) {
+func (dbe *DbEngine) AddClient(name, login, password string) (*Client, error) {
 	newClient := &Client{
 		Name:       name,
 		Login:      login,
@@ -38,7 +38,7 @@ func (dbe *dbEngine) AddClient(name, login, password string) (*Client, error) {
 	return newClient, nil
 }
 
-func (dbe *dbEngine) GetAllLogins() ([]string, error) {
+func (dbe *DbEngine) GetAllLogins() ([]string, error) {
 
 	// Выборка всех значений Login из таблицы и сохранение их в массиве
 	var logins []string

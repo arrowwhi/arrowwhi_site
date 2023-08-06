@@ -23,12 +23,12 @@ func main() {
 	}
 
 	dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s TimeZone=%s",
-		os.Getenv("USERNAME"),
-		os.Getenv("PASSWORD"),
+		os.Getenv("DBUSERNAME"),
+		os.Getenv("DBPASSWORD"),
 		os.Getenv("DBNAME"),
-		os.Getenv("HOST"),
-		os.Getenv("PORT"),
-		os.Getenv("SSLMODE"),
+		os.Getenv("DBHOST"),
+		os.Getenv("DBPORT"),
+		os.Getenv("DBSSLMODE"),
 		os.Getenv("TIMEZONE"))
 	database.GetDb().ConnectToDB(dsn)
 	database.GetDb().CreateClientsTable()

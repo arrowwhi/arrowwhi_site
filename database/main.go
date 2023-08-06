@@ -6,20 +6,21 @@ import (
 	"gorm.io/gorm"
 )
 
-type dbEngine struct {
+type DbEngine struct {
 	db *gorm.DB
 }
 
-var db *dbEngine
+var db *DbEngine
 
-func GetDb() *dbEngine {
+func GetDb() *DbEngine {
 	if db == nil {
-		db = &dbEngine{}
+		db = &DbEngine{}
+		go db.processQueue()
 	}
 	return db
 }
 
-func (dbe *dbEngine) ConnectToDB(dsn string) {
+func (dbe *DbEngine) ConnectToDB(dsn string) {
 	var err error
 	//dsn := "user=golang password=golang dbname=file_library host=localhost port=5432 sslmode=disable TimeZone=Europe/Moscow"
 	dbe.db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -28,10 +29,14 @@ func (dbe *dbEngine) ConnectToDB(dsn string) {
 	}
 }
 
-func (dbe *dbEngine) CreateClientsTable() {
-	// AutoMigrate создает таблицу "clients" согласно структуре Client.
+func (dbe *DbEngine) CreateClientsTable() {
 	err := dbe.db.AutoMigrate(&Client{})
 	if err != nil {
 		log.Error(err.Error())
 	}
+	err = dbe.db.AutoMigrate(&Message{})
+	if err != nil {
+		log.Error(err.Error())
+	}
+
 }
