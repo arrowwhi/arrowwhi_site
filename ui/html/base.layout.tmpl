@@ -4,8 +4,15 @@
     <head>
         <meta charset='utf-8'>
         <title>{{ .title }}</title>
+        <style>
+            #main_body {
+                display: grid;
+                flex: 1;
+                height: 100vh;
+            }
+        </style>
     </head>
-    <body>
+    <body id = "main_body">
         {{template "header" .}}
         <main>
             {{template "main" .}}

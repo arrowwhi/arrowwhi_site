@@ -30,8 +30,8 @@ func main() {
 		os.Getenv("DBPORT"),
 		os.Getenv("DBSSLMODE"),
 		os.Getenv("TIMEZONE"))
-	database.GetDb().ConnectToDB(dsn)
-	database.GetDb().CreateClientsTable()
+	database.Get().ConnectToDB(dsn)
+	database.Get().CreateClientsTable()
 
 	auth.SetJwtKey(os.Getenv("JWTKEY"))
 
@@ -48,11 +48,12 @@ func main() {
 	e.GET("/", handlers.MainHandler)
 	e.GET("/login", handlers.LoginHandler)
 	e.GET("/reg", handlers.RegHandler)
-	e.GET("/logout", handlers.LogoutHandler)
 	e.GET("/chat", handlers.ChatTemplateHandler)
-	e.GET("/chat_s", chat.ChatHandler)
 
-	// Запускаем сервер на порту 8080
+	e.GET("/logout", handlers.LogoutHandler)
+	e.GET("/chat_s", chat.ChatHandler)
+	e.POST("/database/get_messages", handlers.GetMessagesHistory)
+
 	e.Logger.Fatal(e.Start(os.Getenv("STANDARTPORT")))
 
 }

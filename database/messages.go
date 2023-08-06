@@ -9,8 +9,8 @@ var queueMessages = make(chan Message, 100)
 
 type Message struct {
 	ID         uint      `json:"id" gorm:"primaryKey"`
-	From       string    `json:"from" gorm:"not null"`
-	To         string    `json:"to" gorm:"not null"`
+	From       string    `json:"user_from" gorm:"not null;column:user_from"`
+	To         string    `json:"user_to" gorm:"not null;column:user_to"`
 	Message    string    `json:"message" gorm:"not null"`
 	IsRead     bool      `json:"is_read" gorm:"default:false"`
 	CreateDate time.Time `json:"create_date" gorm:"default:current_timestamp"`
@@ -28,7 +28,7 @@ func (dbe *DbEngine) AddMessage(message, from, to string) Message {
 
 func (dbe *DbEngine) processQueue() {
 	for {
-		msg := <-queueMessages // Получаем сообщение из очереди
+		msg := <-queueMessages
 		if err := dbe.db.Create(&msg).Error; err != nil {
 			log.Error(err.Error())
 		}
@@ -39,17 +39,19 @@ func (dbe *DbEngine) processQueue() {
 func (dbe *DbEngine) SelectMessages(from, to string, count, firstID int) []Message {
 	var messages []Message
 
-	query := dbe.db.
-		Where("(`from` = ? AND `to` = ?) OR (`from` = ? AND `to` = ?)", from, to, to, from).
-		Where("id < ?", firstID).
-		Order("id DESC").
-		Limit(count).
-		Find(&messages)
+	query := dbe.db.Where("(\"user_from\" = ? AND \"user_to\" = ?) OR (\"user_from\" = ? AND \"user_to\" = ?)", from, to, to, from)
+	if firstID != 0 {
+		query = query.Where("id < ?", firstID)
+	}
+	query = query.Order("id DESC")
+	if count != 0 {
+		query = query.Limit(count)
+	}
+	query = query.Find(&messages)
 
 	if query.Error != nil {
 		log.Error(query.Error)
 	}
-
 	return messages
 }
 

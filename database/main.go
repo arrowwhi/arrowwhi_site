@@ -12,7 +12,7 @@ type DbEngine struct {
 
 var db *DbEngine
 
-func GetDb() *DbEngine {
+func Get() *DbEngine {
 	if db == nil {
 		db = &DbEngine{}
 		go db.processQueue()
