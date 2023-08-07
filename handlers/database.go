@@ -54,5 +54,7 @@ func TakeFeedback(c echo.Context) error {
 			"error": err.Error(),
 		})
 	}
-	return nil
+	return c.JSON(http.StatusCreated, map[string]string{
+		"status": "success",
+	})
 }

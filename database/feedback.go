@@ -6,11 +6,11 @@ type FeedbackType struct {
 }
 
 type Feedback struct {
-	ID          uint   `gorm:"primaryKey"`
-	TypeID      uint   `gorm:"not null;ForeignKey:FeedbackTypeID"`
-	Description string `gorm:"not null"`
-	Done        bool   `gorm:"default:false"`
-	Trashed     bool   `gorm:"default:false"`
+	ID          uint   `gorm:"primaryKey" json:"id"`
+	TypeID      uint   `gorm:"not null;ForeignKey:FeedbackTypeID" json:"type_id"`
+	Description string `gorm:"not null" json:"description"`
+	Done        bool   `gorm:"default:false" json:"done"`
+	Trashed     bool   `gorm:"default:false" json:"trashed"`
 }
 
 func (dbe *DbEngine) AddFeedback(input *Feedback) error {

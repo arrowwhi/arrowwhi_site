@@ -20,11 +20,11 @@
     popup.appendChild(heading);
 
     const option1 = document.createElement('label');
-    option1.innerHTML = '<input type="radio" name="type" value="Доработка"> Доработка';
+    option1.innerHTML = '<input type="radio" name="type" value="Доработка" > Доработка';
     popup.appendChild(option1);
 
     const option2 = document.createElement('label');
-    option2.innerHTML = '<input type="radio" name="type" value="Баг"> Баг';
+    option2.innerHTML = '<input type="radio" name="type" value="Баг" checked> Баг';
     popup.appendChild(option2);
 
     const description = document.createElement('textarea');
@@ -62,7 +62,6 @@
     const successMessageElem = document.getElementById('successMessage');
 
     openButton.addEventListener('click', () => {
-        console.log("OK")
         event.preventDefault()
     popup.style.display = 'block';
 });
@@ -75,10 +74,30 @@
     sendButtonElem.addEventListener('click', () => {
     const selectedType = document.querySelector('input[name="type"]:checked');
     const descriptionValue = description.value.trim();
-
+    const url = '/feedback/add'
     if (selectedType && descriptionValue !== '') {
-    // Здесь можно выполнить POST-запрос с помощью XMLHttpRequest или fetch
-    // После успешной отправки можно показать сообщение об успехе и очистить поля
+        const dataToSend = {
+            type_id: 2,
+            description: descriptionValue,
+        };
+        if (selectedType.value === "Доработка") {
+            dataToSend.type_id = 1;
+        }
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dataToSend)
+        };
+        fetch(url, options)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data); // Выводим ответ от сервера (если он есть)
+            })
+            .catch(error => {
+                console.error('Ошибка:', error); // Выводим ошибку, если что-то пошло не так
+            });
     successMessageElem.style.display = 'block';
     description.value = '';
 }
