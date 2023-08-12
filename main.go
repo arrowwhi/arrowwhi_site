@@ -49,7 +49,10 @@ func main() {
 	e.GET("/login", handlers.LoginHandler)
 	e.GET("/reg", handlers.RegHandler)
 	e.GET("/chat", handlers.ChatTemplateHandler)
+	e.GET("/chess", handlers.ChessHandler)
+	//e.GET("/markdown")
 
+	//e.POST("/markdown", md.MarkdownHandler)
 	e.GET("/logout", handlers.LogoutHandler)
 	e.GET("/chat_s", chat.ChatHandler)
 	e.POST("/database/get_messages", handlers.GetMessagesHistory)
