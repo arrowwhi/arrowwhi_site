@@ -99,6 +99,20 @@ func RegHandler(c echo.Context) error {
 	return err
 }
 
+func ChessHandler(c echo.Context) error {
+
+	// Данные для передачи в шаблон
+	data := map[string]interface{}{
+		"title": "Шахматы",
+	}
+
+	err := renderBase(c, "chess.page.tmpl", data)
+	if err != nil {
+		log.Error(err.Error())
+	}
+	return err
+}
+
 func LogoutHandler(c echo.Context) error {
 	cookie := &http.Cookie{
 		Name:    "token",
@@ -120,7 +134,7 @@ func renderBase(c echo.Context, page string, data map[string]interface{}) error 
 	// Рендерим шаблон и отправляем результат клиенту
 	err := renderer.Render(c.Response().Writer, page, data)
 	if err != nil {
-		log.Error(err.Error())
+		return err
 	}
 	return err
 

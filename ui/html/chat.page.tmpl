@@ -102,11 +102,6 @@
         "recipient": "",
     }
 
-    let dl_messages = {
-        "m_type": "dl_messages",
-        "user": ""
-    }
-
     // Функция для создания структуры тегов
     function createMessage(author, messageText) {
         const messageDiv = document.createElement("div");
@@ -191,15 +186,14 @@
     }
 
 
-    function take_messages(usr) {
+    async function take_messages(usr) {
         const url = "/database/get_messages"
         const data = {
             username: usr,
             lastId: 0,
             count: 10
         };
-        console.log(data)
-        fetch(url, {
+        await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json' // Заголовок для указания типа данных JSON

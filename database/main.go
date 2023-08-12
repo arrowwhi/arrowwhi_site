@@ -22,7 +22,6 @@ func Get() *DbEngine {
 
 func (dbe *DbEngine) ConnectToDB(dsn string) {
 	var err error
-	//dsn := "user=golang password=golang dbname=file_library host=localhost port=5432 sslmode=disable TimeZone=Europe/Moscow"
 	dbe.db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Error("Connect to database error! \n", err.Error())
@@ -30,13 +29,24 @@ func (dbe *DbEngine) ConnectToDB(dsn string) {
 }
 
 func (dbe *DbEngine) CreateClientsTable() {
-	err := dbe.db.AutoMigrate(&Client{})
-	if err != nil {
+	if err := dbe.db.AutoMigrate(&Client{}); err != nil {
 		log.Error(err.Error())
 	}
-	err = dbe.db.AutoMigrate(&Message{})
-	if err != nil {
+	if err := dbe.db.AutoMigrate(&Message{}); err != nil {
+		log.Error(err.Error())
+	}
+	if err := dbe.db.AutoMigrate(&FeedbackType{}); err != nil {
+		log.Error(err.Error())
+	}
+	if err := dbe.db.AutoMigrate(&Feedback{}); err != nil {
 		log.Error(err.Error())
 	}
 
+	feedbackTypes := []FeedbackType{
+		{ID: 1, Type: "revision"},
+		{ID: 2, Type: "bug"},
+	}
+	if out := dbe.db.Create(&feedbackTypes); out.Error != nil {
+		log.Print(out.Error)
+	}
 }

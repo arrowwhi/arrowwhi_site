@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"net/http"
@@ -33,8 +32,6 @@ func GetMessagesHistory(c echo.Context) error {
 			"error": "Invalid request body",
 		})
 	}
-	fmt.Println("\033[31musername is\033[0m", input.Username)
-	fmt.Println(input.LastId, input.Count)
 	msgs := database.Get().SelectMessages(input.Username, username, input.Count, input.LastId)
 	// Здесь вы можете использовать message.Username и message.LastID
 	// для выполнения нужных действий в вашем приложении
@@ -42,5 +39,22 @@ func GetMessagesHistory(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status":   "success",
 		"messages": msgs,
+	})
+}
+
+func TakeFeedback(c echo.Context) error {
+	input := new(database.Feedback)
+	if err := c.Bind(input); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Invalid request body",
+		})
+	}
+	if err := database.Get().AddFeedback(input); err != nil {
+		return c.JSON(http.StatusServiceUnavailable, map[string]string{
+			"error": err.Error(),
+		})
+	}
+	return c.JSON(http.StatusCreated, map[string]string{
+		"status": "success",
 	})
 }

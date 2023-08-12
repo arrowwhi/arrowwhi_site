@@ -1,0 +1,27 @@
+/* styles.css */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+.chessboard {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    width: 500px;
+    height: 500px;
+    gap: 0;
+    border: 2px solid #333;
+    background-image: url('/images/chess/desc.png');
+    background-size: cover;
+}
+
+.figure {
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    height: 100%;
+}
