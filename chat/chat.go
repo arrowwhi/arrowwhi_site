@@ -53,7 +53,8 @@ func ChatHandler(c echo.Context) error {
 				rawData["message"].(string),
 				username,
 				rawData["recipient"].(string))
-			if cn, exists := connects[rawData["recipient"].(string)]; exists {
+			cn, exists := connects[rawData["recipient"].(string)]
+			if exists {
 				msg, err := json.Marshal(newMessage)
 				if err != nil {
 					log.Print(err)
@@ -64,26 +65,6 @@ func ChatHandler(c echo.Context) error {
 				}
 			}
 			break
-			//case "dl_messages":
-			//	messages := database.Get().SelectMessages(username, rawData["user"].(string), 10, 0)
-			//	d := map[string]interface{}{
-			//		"type":    "dl_messages",
-			//		"content": messages,
-			//	}
-			//	jsonData, err := json.Marshal(d)
-			//	if err != nil {
-			//		fmt.Println("Ошибка при преобразовании массива в JSON:", err)
-			//		continue
-			//	}
-			//
-			//	err = con.WriteMessage(websocket.TextMessage, jsonData)
-			//	if err != nil {
-			//		fmt.Println("Ошибка при отправке данных через веб-сокет:", err)
-			//		continue
-			//	}
-			//break
-			//case "close":
-			//	return nil
 		}
 	}
 	return nil
