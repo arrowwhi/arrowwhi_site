@@ -7,13 +7,14 @@
         margin: 0;
         padding: 0;
         flex: 1;
+        display: flex;
 
     }
 
     .chat_body {
         display: flex;
-        /*margin-bottom: 20px;*/
         flex: auto;
+        padding-top: 75px;
 
     }
 
@@ -24,14 +25,14 @@
         padding: 10px; /* Добавляем отступы вокруг содержимого */
         flex-direction: column;
         justify-content: space-between;
-        width: 100vh;
+        height: 500px;
     }
 
     .sidebar {
         background-color: #f2f2f2;
-        height:85vh;
-        width: 150px;
-        padding: 10px;
+        height:80vh;
+        width: 200px;
+        padding: 0px;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
@@ -43,7 +44,7 @@
         overflow: auto;
         flex-direction: column;
         align-items: flex-start;
-        height: 200px;
+        height: 100vh;
     }
 
     .input_zone {
@@ -66,8 +67,18 @@
 
     .chat_input {
         width: 80vh;
-
     }
+
+    .plain_message {
+        width: 80%; /* Примерная ширина, можно изменить */
+        margin: 0 auto; /* Расположение по центру */
+        color: #626262; /* Серый цвет фона */
+        padding: 20px; /* Отступы внутри дива */
+        font-family: Arial, sans-serif; /* Шрифт */
+        font-size: 30px; /* Размер шрифта */
+        text-align: center; /* Выравнивание текста по центру */
+    }
+
 </style>
 
 <div class = "chat_body">
@@ -80,7 +91,9 @@
     </div>
     <div class="active_zone">
         <div id="message_list" class="message_list">
-
+            <div class="plain_message">
+                Выберите пользователя для начала чата
+            </div>
         </div>
         <div class="input_zone">
             <label for="chat_input">
@@ -152,8 +165,8 @@
         ws.onmessage = function(evt) {
             const struct = JSON.parse(evt.data);
             console.log(evt.data)
-            if (struct.from === single_message.recipient) {
-                print(`${struct.from}:`, " " + struct.message);
+            if (struct.user_from === single_message.recipient) {
+                print(`${struct.user_from}:`, " " + struct.message);
             } else {
                 console.log(struct.from, struct.message)
             }
@@ -178,7 +191,7 @@
             return false;
         }
         single_message.message = input.value;
-        print(single_message.recipient, input.value)
+        print("Вы:", input.value)
         console.log("SEND: " + JSON.stringify(single_message));
         ws.send(JSON.stringify(single_message));
         input.value = ''
@@ -211,8 +224,11 @@
 
     }
 
-
+    // функция для обработки выбора чата
     function handleLoginClick(event, clickedElement) {
+        while (output.firstChild) {
+            output.removeChild(output.firstChild);
+        }
         event.preventDefault();
         const link = event.target;
         single_message.recipient = link.textContent;
@@ -234,7 +250,6 @@
             handleLoginClick(event, this);
         });
     });
-
 </script>
 
 {{end}}
