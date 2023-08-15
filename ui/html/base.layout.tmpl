@@ -4,11 +4,21 @@
     <head>
         <meta charset='utf-8'>
         <title>{{ .title }}</title>
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/css/style.css">
+        <style>
+            .main {
+                padding-top: 70px;
+            }
+        </style>
     </head>
-    <body id = "main_body">
+    <body id = "main_body" class="text-center main_body">
         {{template "header" .}}
+        <main class="main">
             {{template "main" .}}
+        </main>
         {{template "footer" .}}
+        <script src="/js/bootstrap.min.js"></script>
     </body>
 </html>
 {{end}}

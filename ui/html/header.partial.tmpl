@@ -1,35 +1,31 @@
 {{define "header"}}
-<style>
-    .header {
-      position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        padding-bottom: 25px;
-        background: #F7F9FA;
-        height: 50px;
-        color: #6A6C6F;
-        text-align: center;
-      flex-shrink:0
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+  <img src="logo.png" alt="Логотип" style="width: 50px; height: 50px; margin-right: 10px;">
+  <a class="navbar-brand" href="/">Arrowwhi's site</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon">
+    </span>
+  </button>
+  <div class="collapse navbar-collapse ml-auto" id="navbarCollapse">
 
-    }
-</style>
-<header class="header">
-  <div style="display: flex; align-items: center; justify-content: space-between;">
-    <div style="display: flex; align-items: center;">
-      <img src="logo.png" alt="Логотип" style="width: 60px; height: 60px; margin-right: 10px;">
-      <h1><a href="/">Arrowwhi's site</a></h1>
-    </div>
-    <div>
+    <ul class="navbar-nav ml-auto">
       {{ if .LoginInfo }}
-        Вы зашли как <a href="#">{{.LoginInfo}}</a>.
-      <a href="/logout">Выйти</a>
+      <li class="nav-item">
+        <span class="nav-link">Вы вошли как <a href="#">{{.LoginInfo}}</a>.
+        </span></li>
+      <li class="nav-item">
+        <a class="nav-link" href="/logout">Выйти</a>
+      </li>
       {{ else }}
-      <a href="/login">Войти</a>
-      <a href="/reg">Регистрация</a>
+      <li class="nav-item">
+        <a class="nav-link" href="/login">Войти</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/reg">Регистрация</a>
+      </li>
       {{ end }}
-    </div>
+    </ul>
   </div>
-</header>
+</nav>
 {{end}}
 

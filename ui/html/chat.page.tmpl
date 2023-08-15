@@ -8,31 +8,38 @@
         padding: 0;
         flex: 1;
         display: flex;
-
     }
+
 
     .chat_body {
         display: flex;
         flex: auto;
-        padding-top: 75px;
-
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
     .active_zone {
         display: flex;
-        border: 2px solid #000; /* Толщина рамки и ее стиль */
-        border-radius: 10px; /* Радиус закругления углов */
+        width: 100%;
+        /*height: 80%;*/
+        /*border: 2px solid #000; !* Толщина рамки и ее стиль *!*/
+        /*border-radius: 10px; !* Радиус закругления углов *!*/
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         padding: 10px; /* Добавляем отступы вокруг содержимого */
         flex-direction: column;
-        justify-content: space-between;
+        /*justify-content: space-between;*/
         height: 500px;
+    }
+
+    .input_container {
+        display: flex;
+        align-items: center;
     }
 
     .sidebar {
         background-color: #f2f2f2;
         height:80vh;
         width: 200px;
-        padding: 0px;
+        /*padding: 0px;*/
         overflow-y: auto;
         display: flex;
         flex-direction: column;
@@ -43,8 +50,9 @@
         display: flex;
         overflow: auto;
         flex-direction: column;
-        align-items: flex-start;
+        align-items: flex-end;
         height: 100vh;
+        justify-content: flex-end;
     }
 
     .input_zone {
@@ -53,9 +61,6 @@
 
     }
 
-    .login_click {
-        color: #cccccc;
-    }
 
     .user_lnk {
         margin: 5px 0;
@@ -64,11 +69,10 @@
         background-color: #4CAF50;
         color: white;
     }
-
     .chat_input {
-        width: 80vh;
+        width: 95vh;
+        margin-right: 10px;
     }
-
     .plain_message {
         width: 80%; /* Примерная ширина, можно изменить */
         margin: 0 auto; /* Расположение по центру */
@@ -76,30 +80,99 @@
         padding: 20px; /* Отступы внутри дива */
         font-family: Arial, sans-serif; /* Шрифт */
         font-size: 30px; /* Размер шрифта */
-        text-align: center; /* Выравнивание текста по центру */
+        text-align: center;
+    }
+
+    .msg_class {
+        border: 0 solid #000;
     }
 
 </style>
 
+<style>
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table th,
+    .table td {
+        padding: 5px;
+    }
+
+    .table th:first-child,
+    .table td:first-child,
+    .table th:nth-child(2),
+    .table td:nth-child(2) {
+        text-align: left;
+    }
+
+    .table th:last-child,
+    .table td:last-child {
+        text-align: right;
+    }
+
+    .table th:first-child,
+    .table th:last-child {
+        width: 100px;
+    }
+
+    .table th:nth-child(3),
+    .table td:nth-child(3) {
+        width: 70px;
+    }
+</style>
+
 <div class = "chat_body">
-    <div class="sidebar">
+    <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-body-tertiary" style="width: 350px;">
+        <span class="d-flex align-items-center flex-shrink-0 p-3 link-body-emphasis text-decoration-none border-bottom">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-list" viewBox="0 0 16 16">
+  <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"></path>
+  <path d="M5 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 5 8zm0-2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0 5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-1-5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zM4 8a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm0 2.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z"></path>
+</svg>
+            <span class="fs-5 fw-semibold">   Диалоги</span>
+        </span>
+        <div class="list-group list-group-flush border-bottom scrollarea">
         {{range .logins}}
-        <div class="user_lnk">
-            <a href="#" class="login_click">{{.}}</a>
-        </div>
+        <a href="#" class="list-group-item list-group-item-action py-3 lh-sm login_click">
+            <div class="d-flex w-100 align-items-center justify-content-between">
+                <strong class="mb-1">{{.}}</strong>
+                <small class="text-body-secondary">Tues</small>
+            </div>
+            <div class="col-10 mb-1 small">Some placeholder content.</div>
+        </a>
         {{end}}
+        </div>
     </div>
     <div class="active_zone">
-        <div id="message_list" class="message_list">
-            <div class="plain_message">
-                Выберите пользователя для начала чата
-            </div>
+        <div class="message_list">
+{{/*            <div class="plain_message">*/}}
+{{/*                Выберите пользователя для начала чата*/}}
+{{/*            </div>*/}}
+            <table class="table" id="message_list">
+                <tr>
+                    <th>Вася</th>
+                    <td>Привет бро</td>
+                    <td>10:15</td>
+                </tr>
+{{/*                <tr>*/}}
+{{/*                    <th>Вася</th>*/}}
+{{/*                    <td>Как ты?</td>*/}}
+{{/*                    <td>10:15</td>*/}}
+{{/*                </tr>*/}}
+{{/*                <tr>*/}}
+{{/*                    <th>Вы</th>*/}}
+{{/*                    <td>Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?</td>*/}}
+{{/*                    <td>10:18</td>*/}}
+{{/*                </tr>*/}}
+            </table>
         </div>
         <div class="input_zone">
-            <label for="chat_input">
-                <input type="text" class="chat_input" id="chat_input" placeholder="вводить текст сюда" onkeydown="checkEnter(event)" />
-                <input id="send" type="submit" onclick="press_send(event)" />
-            </label>
+            <div class="input_container">
+                <input class="form-control chat_input" id="chat_input" type="text" placeholder="Пишите тут..." onkeydown="checkEnter(event)">
+{{/*                <input type="text" class="chat_input" id="chat_input" placeholder="вводить текст сюда" onkeydown="checkEnter(event)" />*/}}
+                <input id="send" class="btn btn-light" type="submit" value="Отправить" onclick="press_send(event)" />
+            </div>
         </div>
     </div>
 </div>
@@ -116,28 +189,28 @@
     }
 
     // Функция для создания структуры тегов
-    function createMessage(author, messageText) {
-        const messageDiv = document.createElement("div");
-        messageDiv.classList.add("message");
+    function createMessage(author, messageText, time) {
+        const newRow = document.createElement("tr");
 
-        const strongElement = document.createElement("strong");
-        const authorLink = document.createElement("a");
-        authorLink.href = "#user";
-        authorLink.textContent = author;
-        strongElement.appendChild(authorLink);
+// Создание ячеек <th> и <td> для новой строки
+        const thCell = document.createElement("th");
+        thCell.textContent = author; // Здесь можно указать имя
+        const tdCell1 = document.createElement("td");
+        tdCell1.textContent = messageText; // Здесь можно указать сообщение
+        const tdCell2 = document.createElement("td");
+        const currentTime = new Date().toLocaleTimeString(); // Получение текущего времени
+        tdCell2.textContent = currentTime;
 
-        const spanElement = document.createElement("span");
-        spanElement.textContent = messageText;
+        newRow.appendChild(thCell);
+        newRow.appendChild(tdCell1);
+        newRow.appendChild(tdCell2);
 
-        messageDiv.appendChild(strongElement);
-        messageDiv.appendChild(spanElement);
-
-        return messageDiv;
+        return newRow;
     }
 
     // функция для печати сообщений снизу
-    const print = function (author, message) {
-        const d = createMessage(author, message)
+    const print = function (author, message, time) {
+        const d = createMessage(author, message, time)
         output.appendChild(d);
         output.scroll(0, output.scrollHeight);
     };
@@ -226,10 +299,10 @@
 
     // функция для обработки выбора чата
     function handleLoginClick(event, clickedElement) {
+        event.preventDefault();
         while (output.firstChild) {
             output.removeChild(output.firstChild);
         }
-        event.preventDefault();
         const link = event.target;
         single_message.recipient = link.textContent;
 

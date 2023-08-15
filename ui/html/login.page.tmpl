@@ -2,78 +2,52 @@
 
 {{define "main"}}
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
+        .main {
+            padding-top: 0px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
+        .input_form {
             padding: 40px;
-            background-color: #fff;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
         }
 
-        .container h2 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .container input[type="text"],
-        .container input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        .container input[type="submit"] {
-            width: 100%;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .container input[type="submit"]:hover {
-            background-color: #45a049;
-        }
-
-        .container p {
+        .input_form p {
             text-align: center;
             margin-top: 20px;
         }
+        .input_form button {
+            margin-bottom: 10px; /* Добавляем маргин снизу полям ввода */
+            margin-top: 10px; /* Добавляем маргин сверху кнопке "Войти" */
+        }
+
     </style>
-<div class="container">
-    <h2>Авторизация</h2>
-    <form id="login-form" onsubmit="submitForm(event)">
-        <label for="username"></label><input type="text" id="username" placeholder="Имя пользователя" required>
-        <label for="password"></label><input type="password" id="password" placeholder="Пароль" required>
-        <input type="submit" value="Войти">
+<div class="input_form">
+    <form id="login-form" class="form-signin" onsubmit="submitForm(event)">
+        <h1 class="h3 mb-3 font-weight-normal">Авторизация</h1>
+        <label for="inputLogin" class="sr-only">Логин</label>
+        <input type="text" id="inputLogin" class="form-control" placeholder="Логин" required="" autofocus="">
+        <label for="inputPassword" class="sr-only">Пароль</label>
+        <input type="password" id="inputPassword" class="form-control" placeholder="Пароль" required="">
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Войти</button>
     </form>
     <p>Нет аккаунта? <a href="/reg">Зарегистрируйтесь</a></p>
 </div>
 
 <script>
     function submitForm(event) {
-        event.preventDefault(); // Предотвращаем отправку формы по умолчанию
+        event.preventDefault();
 
-        var username = document.getElementById('username').value;
-        var password = document.getElementById('password').value;
-
-        // Хеширование пароля
-        var hashedPassword = hashPassword(password);
+        const username = document.getElementById('inputLogin').value;
+        const password = document.getElementById('inputPassword').value;
 
         // Создание объекта с данными для отправки
-        var formData = new FormData();
+        const formData = new FormData();
         formData.append('username', username);
-        formData.append('password', hashedPassword);
+        formData.append('password', password);
 
         // Отправка данных формы через POST-запрос с использованием fetch
         fetch('login', {
@@ -96,18 +70,11 @@
             });
     }
 
-    function hashPassword(password) {
-        // Реализуйте здесь код для хеширования пароля (например, с помощью bcrypt, SHA, или другого алгоритма)
-        // Возвращайте хешированный пароль
-        return password;
-    }
-
     function showErrorMessage() {
         const errorMessage = document.createElement('p');
         errorMessage.textContent = 'Введен неправильный логин/пароль';
         errorMessage.style.color = 'red';
         errorMessage.style.textAlign = 'center';
-
         const container = document.querySelector('.container');
         container.appendChild(errorMessage);
     }
