@@ -1,23 +1,13 @@
 {{define "footer"}}
-<style>
-    .footer {
-        position: absolute;
-        bottom: 0;
-        width: 100vw;
-        border-top: 1px solid #E4E5E7;
-        padding-top: 10px;
-        padding-bottom: 15px;
-        background: #F7F9FA;
-        height: 15px;
-        color: #6A6C6F;
-        text-align: center;
-        flex-shrink:0
-    }
-</style>
+
 <footer class="footer">
-    <a href="#" id="feedback"> Обратная связь - фиксирование багов и предложение доработок </a>
+    <div class="container">
+        <span class="text-muted">
+            <a href="#" id="feedback"> Обратная связь</a> - фиксирование багов и предложение доработок </a>
+        </span>
+    </div>
 </footer>
-<script src="js/feedback.js"></script>
+<script src="/js/feedback.js"></script>
 <script>
     createPopup();
 </script>

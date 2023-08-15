@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-// Ключ для подписи JWT токена (замените на свой секретный ключ)
+// Ключ для подписи JWT токена
 var jwtKey []byte
 
 // Claims Вспомогательная структура для передачи данных в JWT токен
@@ -82,10 +82,8 @@ func TakeAuthHandler(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusForbidden, err.Error())
 	}
-
-	if client == nil || client.Password != pass {
-		return c.String(http.StatusForbidden, "неправильный логин или пароль")
-
+	if client == nil || !ComparePassword(client.Password, pass) {
+		return c.String(http.StatusForbidden, "Неправильный логин или пароль")
 	}
 
 	// Создаем JWT токен
@@ -108,7 +106,11 @@ func TakeRegHandler(c echo.Context) error {
 	login := c.FormValue("login")
 	pass := c.FormValue("password")
 	// TODO validate fields
-	_, err := database.Get().AddClient(name, login, pass)
+	pass, err := HashPassword(pass)
+	if err != nil {
+		return c.String(http.StatusServiceUnavailable, err.Error())
+	}
+	_, err = database.Get().AddClient(name, login, pass)
 	if err != nil {
 		return c.String(http.StatusServiceUnavailable, err.Error())
 	}
