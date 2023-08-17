@@ -70,6 +70,5 @@ func (dbe *DbEngine) FindUsersWithMessages(user string) ([]string, error) {
 	if query.Error != nil {
 		return nil, query.Error
 	}
-
 	return users, nil
 }

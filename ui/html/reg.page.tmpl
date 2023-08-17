@@ -5,83 +5,122 @@
     body {
         font-family: Arial, sans-serif;
         background-color: #f2f2f2;
+        justify-content: center;
+        align-items: center;
     }
 
+    /*.registration-container {*/
+    /*    max-width: 400px;*/
+    /*    margin: 0 auto;*/
+    /*    padding: 40px;*/
+    /*    background-color: #ccc;*/
+    /*    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);*/
+    /*}*/
+
+    /*.registration-container h2 {*/
+    /*    text-align: center;*/
+    /*    margin-bottom: 30px;*/
+    /*}*/
+
+    /*.registration-container input[type="text"],*/
+    /*.registration-container input[type="password"] {*/
+    /*    width: 100%;*/
+    /*    padding: 10px;*/
+    /*    margin-bottom: 20px;*/
+    /*    border: 1px solid #ccc;*/
+    /*    border-radius: 4px;*/
+    /*    box-sizing: border-box;*/
+    /*}*/
+
+    /*.registration-container input[type="submit"] {*/
+    /*    width: 100%;*/
+    /*    padding: 10px;*/
+    /*    background-color: #4CAF50;*/
+    /*    color: #fff;*/
+    /*    border: none;*/
+    /*    border-radius: 4px;*/
+    /*    cursor: pointer;*/
+    /*    font-size: 16px;*/
+    /*}*/
+
+    /*.registration-container input[type="submit"]:hover {*/
+    /*    background-color: #45a049;*/
+    /*}*/
+
+    /*.registration-container p {*/
+    /*    text-align: center;*/
+    /*    margin-top: 20px;*/
+    /*}*/
+    .main {
+        padding-top: 0px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
     .registration-container {
-        max-width: 400px;
-        margin: 0 auto;
         padding: 40px;
-        background-color: #ccc;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .registration-container h2 {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .registration-container input[type="text"],
-    .registration-container input[type="password"] {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 20px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box;
-    }
-
-    .registration-container input[type="submit"] {
-        width: 100%;
-        padding: 10px;
-        background-color: #4CAF50;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 16px;
-    }
-
-    .registration-container input[type="submit"]:hover {
-        background-color: #45a049;
-    }
-
-    .registration-container p {
-        text-align: center;
-        margin-top: 20px;
+        border-radius: 10px;
     }
 </style>
-<div class="registration-container">
-    <h1>Регистрация</h1>
-    <form id="registrationForm" action="/reg" method="post" onsubmit="return validateForm()">
-        <div>
-            <label for="name">Имя:</label>
-            <input type="text" id="name" name="name" maxlength="50" required>
+    <form class="needs-validation" novalidate="" action="/reg" method="post" onsubmit="return validateForm()">
+        <div class="row g-3">
+            <div class="col-sm-6">
+                <label for="fName" class="form-label">Имя</label>
+                <input type="text" class="form-control" id="fName" name="fName" placeholder="Ваня" value="" required="">
+                <div class="invalid-feedback">
+                    Введите имя
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <label for="lName" class="form-label">Фамилия</label>
+                <input type="text" class="form-control" id="lName" name="lName" placeholder="Ванин" value="" required="">
+                <div class="invalid-feedback">
+                    Введите фамилию
+                </div>
+            </div>
+            <div class="col-12">
+                <label for="username" class="form-label">Логин</label>
+                <div class="input-group has-validation">
+                    <span class="input-group-text">@</span>
+                    <input type="text" class="form-control" name="login" id="username" placeholder="Username" required="">
+                    <div class="invalid-feedback">
+                        Логин уже занят
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <label for="address" class="form-label">Пароль</label>
+                <input type="password" class="form-control" name="password" id="address" placeholder="Не меньше 8 символов" required="">
+                <div class="invalid-feedback">
+                    Пароль должен содержать не меньше 8 символов
+                </div>
+            </div>
+            <div class="col-12">
+                <label for="confirmPassword" class="form-label">Пароль <span class="text-body-secondary">(повторно)</span></label>
+                <input type="password" class="form-control" id="confirmPassword" required="">
+                <div class="invalid-feedback">
+                    Пароли не совпадают!
+                </div>
+            </div>
+
         </div>
-        <div>
-            <label for="login">Логин:</label>
-            <input type="text" id="login" name="login" pattern="[A-Za-z0-9_-]+" required>
-            <span class="error" id="loginError"></span>
-        </div>
-        <div>
-            <label for="password">Пароль:</label>
-            <input type="password" id="password" name="password" minlength="8" required>
-        </div>
-        <div>
-            <label for="confirmPassword">Подтвердите пароль:</label>
-            <input type="password" id="confirmPassword" name="confirmPassword" minlength="8" required>
-            <span class="error" id="passwordError"></span>
-        </div>
-        <div>
-            <input type="submit" value="Зарегистрироваться">
-        </div>
+
+        <hr class="my-4">
+
+        <button class="w-100 btn btn-primary btn-lg" type="submit">Зарегистрироваться</button>
     </form>
 </div>
 <script>
     function validateForm() {
-        var login = document.getElementById('login').value;
-        var password = document.getElementById('password').value;
-        var confirmPassword = document.getElementById('confirmPassword').value;
-        var loginPattern = /^[A-Za-z0-9_-]+$/;
+        const fname = document.getElementById('fName').value;
+        const lname = document.getElementById('lName').value;
+        console.log(fname, lname)
+        const login = document.getElementById('login').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const loginPattern = /^[A-Za-z0-9_-]+$/;
 
         // Проверка логина
         if (!loginPattern.test(login)) {

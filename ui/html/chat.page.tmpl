@@ -17,13 +17,32 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
-    .active_zone {
+    .active_early {
         display: flex;
         width: 100%;
         /*height: 80%;*/
         /*border: 2px solid #000; !* Толщина рамки и ее стиль *!*/
         /*border-radius: 10px; !* Радиус закругления углов *!*/
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 10px; /* Добавляем отступы вокруг содержимого */
+        flex-direction: column;
+        justify-content: space-between;
+        height: 550px;
+    }
+
+    #early_href {
+        /*width: 100%;*/
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 10px; /* Добавляем отступы вокруг содержимого */
+    }
+
+    .active_zone {
+        display: flex;
+        width: 100%;
+        /*height: 80%;*/
+        /*border: 2px solid #000; !* Толщина рамки и ее стиль *!*/
+        /*border-radius: 10px; !* Радиус закругления углов *!*/
+        /*box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);*/
         padding: 10px; /* Добавляем отступы вокруг содержимого */
         flex-direction: column;
         /*justify-content: space-between;*/
@@ -48,20 +67,19 @@
 
     .message_list {
         display: flex;
-        overflow: auto;
+        /*overflow: auto;*/
         flex-direction: column;
         align-items: flex-end;
         height: 100vh;
         justify-content: flex-end;
+        overflow-y: auto;
     }
 
     .input_zone {
-        display: flex;
-        width: 100vh;
+        /*display: flex;*/
+        width: 100%;
 
     }
-
-
     .user_lnk {
         margin: 5px 0;
         padding: 5px;
@@ -70,9 +88,14 @@
         color: white;
     }
     .chat_input {
-        width: 95vh;
+        width: 90%;
         margin-right: 10px;
     }
+
+    .chat_button {
+        width: 10%;
+    }
+
     .plain_message {
         width: 80%; /* Примерная ширина, можно изменить */
         margin: 0 auto; /* Расположение по центру */
@@ -121,111 +144,61 @@
     .table td:nth-child(3) {
         width: 70px;
     }
+
+    .invisible {
+        /*display: none;*/
+        height: 0;
+    }
+
+
 </style>
 
 <div class = "chat_body">
     <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-body-tertiary" style="width: 350px;">
-        <span class="d-flex align-items-center flex-shrink-0 p-3 link-body-emphasis text-decoration-none border-bottom">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-list" viewBox="0 0 16 16">
-  <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"></path>
-  <path d="M5 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 5 8zm0-2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0 5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-1-5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zM4 8a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm0 2.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z"></path>
-</svg>
-            <span class="fs-5 fw-semibold">   Диалоги</span>
-        </span>
-        <div class="list-group list-group-flush border-bottom scrollarea">
+        <form class="d-flex mt-3 mt-lg-0" role="search">
+            <input id="loginsSearch" class="form-control me-2" type="search" placeholder="Search" aria-label="Search" data-toggle="dropdown">
+        </form>
+        <div id="messagesList" class="list-group list-group-flush border-bottom scrollarea">
         {{range .logins}}
         <a href="#" class="list-group-item list-group-item-action py-3 lh-sm login_click">
             <div class="d-flex w-100 align-items-center justify-content-between">
-                <strong class="mb-1">{{.}}</strong>
-                <small class="text-body-secondary">Tues</small>
+                <strong class="mb-1">{{.user}}</strong>
+                <small class="text-body-secondary">{{.create_date}}</small>
             </div>
-            <div class="col-10 mb-1 small">Some placeholder content.</div>
+            <div class="col-10 mb-1 small">{{if (eq .rotation "from")}}Вы:{{end}}{{.message}}</div>
         </a>
         {{end}}
         </div>
-    </div>
-    <div class="active_zone">
-        <div class="message_list">
-{{/*            <div class="plain_message">*/}}
-{{/*                Выберите пользователя для начала чата*/}}
-{{/*            </div>*/}}
-            <table class="table" id="message_list">
-                <tr>
-                    <th>Вася</th>
-                    <td>Привет бро</td>
-                    <td>10:15</td>
-                </tr>
-{{/*                <tr>*/}}
-{{/*                    <th>Вася</th>*/}}
-{{/*                    <td>Как ты?</td>*/}}
-{{/*                    <td>10:15</td>*/}}
-{{/*                </tr>*/}}
-{{/*                <tr>*/}}
-{{/*                    <th>Вы</th>*/}}
-{{/*                    <td>Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?Отлично бро, ты как?</td>*/}}
-{{/*                    <td>10:18</td>*/}}
-{{/*                </tr>*/}}
-            </table>
+        <div id="loginsList" class="list-group list-group-flush border-bottom scrollarea invisible">
         </div>
-        <div class="input_zone">
-            <div class="input_container">
-                <input class="form-control chat_input" id="chat_input" type="text" placeholder="Пишите тут..." onkeydown="checkEnter(event)">
-{{/*                <input type="text" class="chat_input" id="chat_input" placeholder="вводить текст сюда" onkeydown="checkEnter(event)" />*/}}
-                <input id="send" class="btn btn-light" type="submit" value="Отправить" onclick="press_send(event)" />
+    </div>
+    <div class="active_early">
+        <div id="early_href_div" class="invisible"><a href="#" id="early_href">Загрузить ранние...</a></div>
+        <div class="active_zone">
+            <div class="message_list">
+                <table class="table" id="message_list">
+                    <tr>
+                        <th> </th>
+                        <td>Выберите пользователя для начала чата</td>
+                        <td> </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="input_zone">
+                <div class="input_container">
+                    <input class="form-control chat_input" id="chat_input" type="text" placeholder="Пишите тут..." onkeydown="checkEnter(event)">
+                    <input id="send" class="btn btn-light chat_button" type="submit" value="Отправить" onclick="press_send(event)" />
+                </div>
             </div>
         </div>
     </div>
 </div>
-
+<script src="js/chat.js"></script>
 <script>
-    const input = document.getElementById("chat_input");
-    const output = document.getElementById("message_list");
-    let ws;
-
-    let single_message = {
-        "m_type": "message",
-        "message": "",
-        "recipient": "",
-    }
-
-    // Функция для создания структуры тегов
-    function createMessage(author, messageText, time) {
-        const newRow = document.createElement("tr");
-
-// Создание ячеек <th> и <td> для новой строки
-        const thCell = document.createElement("th");
-        thCell.textContent = author; // Здесь можно указать имя
-        const tdCell1 = document.createElement("td");
-        tdCell1.textContent = messageText; // Здесь можно указать сообщение
-        const tdCell2 = document.createElement("td");
-        const currentTime = new Date().toLocaleTimeString(); // Получение текущего времени
-        tdCell2.textContent = currentTime;
-
-        newRow.appendChild(thCell);
-        newRow.appendChild(tdCell1);
-        newRow.appendChild(tdCell2);
-
-        return newRow;
-    }
-
-    // функция для печати сообщений снизу
-    const print = function (author, message, time) {
-        const d = createMessage(author, message, time)
-        output.appendChild(d);
-        output.scroll(0, output.scrollHeight);
-    };
-
-    // функция для печати сообщений сверху
-    const print_forward = function (author, message) {
-        const d = createMessage(author, message);
-        output.prepend(d);
-        output.scroll(0, output.scrollHeight);
-    };
-
     // функция создания вебсокета
     document.addEventListener('DOMContentLoaded', function() {
         if (ws) {
-            return false;
+            return
         }
         ws = new WebSocket("{{.chatId}}");
         ws.onopen = function() {
@@ -239,89 +212,28 @@
             const struct = JSON.parse(evt.data);
             console.log(evt.data)
             if (struct.user_from === single_message.recipient) {
-                print(`${struct.user_from}:`, " " + struct.message);
+                print(`${struct.user_from}:`, " " + struct.message, new Date());
             } else {
                 console.log(struct.from, struct.message)
             }
+            const elem = getFromCurrentLogin(struct.user_from)
+            if (elem) {
+                elem.remove()
+            }
+            const messageData = {
+                user: struct.user_from, // struct.user_from,
+                create_date: dateTimeValidation(new Date()),
+                message: struct.message
+            };
+            const newElem = createLoginMessage(messageData)
+            q = document.getElementById("messagesList")
+            q.prepend(newElem)
+
+
         }
         ws.onerror = function(evt) {
             console.log("ERROR: " + evt.data);
         }
-        return false;
-    });
-
-    //проверка евента на нажатую клаишу enter           - ?
-    function checkEnter(evt) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            press_send(evt)
-        }
-    }
-
-    // отправка сообщения на сервер
-    function press_send() {
-        if (!ws) {
-            return false;
-        }
-        single_message.message = input.value;
-        print("Вы:", input.value)
-        console.log("SEND: " + JSON.stringify(single_message));
-        ws.send(JSON.stringify(single_message));
-        input.value = ''
-        return false;
-    }
-
-
-    async function take_messages(usr) {
-        const url = "/database/get_messages"
-        const data = {
-            username: usr,
-            lastId: 0,
-            count: 10
-        };
-        await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json' // Заголовок для указания типа данных JSON
-            },
-            body: JSON.stringify(data) // Преобразование данных в JSON и отправка в теле запроса
-        })
-            .then(response => response.json())
-            .then(data => {
-                // Обработка полученных данных
-                for (let elem of data.messages) {
-                    print_forward(elem.user_from, elem.message)
-                }
-            })
-            .catch(error => console.error('Ошибка:', error));
-
-    }
-
-    // функция для обработки выбора чата
-    function handleLoginClick(event, clickedElement) {
-        event.preventDefault();
-        while (output.firstChild) {
-            output.removeChild(output.firstChild);
-        }
-        const link = event.target;
-        single_message.recipient = link.textContent;
-
-        take_messages(link.textContent)
-        const allLinks = document.querySelectorAll('.user_lnk');
-        for (let i = 0; i < allLinks.length; i++) {
-            allLinks[i].style.backgroundColor = "#4CAF50";
-        }
-
-        const divElement = clickedElement.parentNode;
-        divElement.style.backgroundColor = 'blue';
-    }
-
-    const links = document.querySelectorAll(".login_click");
-    links.forEach((link) => {
-        link.addEventListener("click", function(event) {
-            event.preventDefault();
-            handleLoginClick(event, this);
-        });
     });
 </script>
 

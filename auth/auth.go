@@ -101,8 +101,12 @@ func TakeAuthHandler(c echo.Context) error {
 	return c.String(http.StatusOK, "Login successful")
 }
 
+// TakeRegHandler регистрация пользователя
 func TakeRegHandler(c echo.Context) error {
-	name := c.FormValue("name")
+	fName := c.FormValue("fName")
+	fmt.Println(fName)
+	lName := c.FormValue("lName")
+	fmt.Println(lName)
 	login := c.FormValue("login")
 	pass := c.FormValue("password")
 	// TODO validate fields
@@ -110,7 +114,7 @@ func TakeRegHandler(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusServiceUnavailable, err.Error())
 	}
-	_, err = database.Get().AddClient(name, login, pass)
+	_, err = database.Get().AddClient(fName, lName, login, pass)
 	if err != nil {
 		return c.String(http.StatusServiceUnavailable, err.Error())
 	}

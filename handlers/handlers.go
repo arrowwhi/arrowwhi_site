@@ -53,7 +53,10 @@ func ChatTemplateHandler(c echo.Context) error {
 	} else {
 		return c.Redirect(http.StatusFound, "/login")
 	}
-	logins, err := database.Get().GetAllLogins()
+	logins := database.Get().GetLoginsToLine(username)
+	for i, v := range logins {
+		logins[i]["create_date"] = v["create_date"].(time.Time).Format("02 Jan 15:04")
+	}
 	if err != nil {
 		log.Error(err.Error())
 	}
