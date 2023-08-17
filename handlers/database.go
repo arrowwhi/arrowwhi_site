@@ -58,3 +58,14 @@ func TakeFeedback(c echo.Context) error {
 		"status": "success",
 	})
 }
+
+func GetLogins(c echo.Context) error {
+	logins, err := database.Get().GetLogins()
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"status": "success",
+		"logins": logins,
+	})
+}
