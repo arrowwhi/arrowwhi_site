@@ -31,6 +31,9 @@ const print = function (author, message, time) {
     const d = createMessage(author, message, time)
     output.appendChild(d);
     output.scroll(0, output.scrollHeight);
+    const msgs = document.getElementById('message_list')
+    console.log(msgs)
+    msgs.scrollTop = msgs.scrollHeight;
 };
 
 // функция для печати сообщений сверху
@@ -38,6 +41,7 @@ const print_forward = function (author, message, time) {
     const d = createMessage(author, message, time);
     output.prepend(d);
     output.scroll(0, output.scrollHeight);
+
 };
 
 //проверка евента на нажатую клаишу enter           - ?
@@ -63,6 +67,9 @@ function press_send() {
     console.log("SEND: " + JSON.stringify(single_message));
     ws.send(JSON.stringify(single_message));
     input.value = ''
+    const msgs = document.getElementById('message_list')
+    console.log("OKAY")
+    msgs.scrollTop = msgs.scrollHeight;
 }
 
 let lastMessage = 0

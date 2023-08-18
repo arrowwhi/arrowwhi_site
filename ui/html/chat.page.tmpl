@@ -2,18 +2,21 @@
 
 {{define "main"}}
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        flex: 1;
-        display: flex;
-    }
+    /*body {*/
+    /*    font-family: Arial, sans-serif;*/
+    /*    margin: 0;*/
+    /*    padding: 0;*/
+    /*    flex: 1;*/
+    /*    display: flex;*/
+    /*}*/
 
 
     .chat_body {
         display: flex;
         flex: auto;
+        flex-direction: row;
+        height: 100%;
+        border: 2px solid #000; /* Толщина рамки и ее стиль */
     }
 
     .active_early {
@@ -34,7 +37,8 @@
         width: 100%;
         padding: 10px; /* Добавляем отступы вокруг содержимого */
         flex-direction: column;
-        height: 500px;
+        /*height: 500px;*/
+        height: 77%;
     }
 
     .input_container {
@@ -105,14 +109,14 @@
 
 </style>
 
-<div class = "chat_body shadow p-1">
-    <div id="lgns" class=" flex-column flex-shrink-0" style="width: 300px;">
+<div class = "container-fluid vh-100  chat_body shadow p-1">
+    <div id="lgns" class=" flex-column flex-shrink-0 col-12 col-md-6" >
         <form class="d-flex mt-3 mt-lg-0" role="search">
             <input id="loginsSearch" class="form-control me-2" type="search" placeholder="Search" aria-label="Search" data-toggle="dropdown">
         </form>
         <div id="messagesList" class="list-group list-group-flush border-bottom scrollarea">
         {{range .logins}}
-        <a href="#" class="list-group-item list-group-item-action py-3 lh-sm login_click">
+        <a href="#" class="list-group-item list-group-item-action py-3 lh-sm login_click col-12 col-md-6">
             <div class="d-flex w-100 align-items-center justify-content-between">
                 <strong class="mb-1">{{.user}}</strong>
                 <small class="text-body-secondary">{{.create_date}}</small>
