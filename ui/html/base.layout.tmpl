@@ -4,8 +4,8 @@
     <head>
         <meta charset='utf-8'>
         <title>{{ .title }}</title>
-        <link rel="stylesheet" href="/css/bootstrap.min.css">
-        <link rel="stylesheet" href="/css/style.css">
+        <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+{{/*        <link rel="stylesheet" href="/css/style.css">*/}}
         <style>
             .main {
                 padding-top: 70px;
@@ -18,8 +18,12 @@
         <main class="main">
             {{template "main" .}}
         </main>
-        {{template "footer" .}}
-        <script src="/js/bootstrap.min.js"></script>
+{{/*        {{template "footer" .}}*/}}
+{{/*        <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>*/}}
+        {{/*        <script src="https://unpkg.com/@popperjs/core@2"></script>*/}}
+        <script src="/bootstrap/js/bootstrap.min.js"></script>
+        <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+{{/*        <script src="https://bootstrap-4.ru/docs/5.0/dist/js/bootstrap.bundle.min.js"></script>*/}}
     </body>
 </html>
 {{end}}
