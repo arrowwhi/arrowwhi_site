@@ -111,10 +111,16 @@ function handleLoginClick(event, clickedElement) {
         allLinks[i].classList.remove("active")
     }
     clickedElement.classList.add("active")
-
     while (output.firstChild) {
         output.removeChild(output.firstChild);
     }
+
+    let all_messages = document.getElementById('message_zero')
+    if (all_messages) {
+        all_messages.classList.remove("d-none")
+    }
+    hideLogins()
+
     const strongElement = clickedElement.querySelector(".mb-1"); // Выбираем внутренний элемент с классом "mb-1"
     const user = strongElement.textContent; // Получаем текстовое содержимое элемента
 
@@ -240,8 +246,11 @@ function hideLogins() {
     const logins = document.getElementById('lgns')
     if (logins.classList.contains('d-none')) {
         logins.classList.remove('d-none')
+        const all_messages = document.getElementById('message_zero')
+        all_messages.classList.add('d-none')
     } else {
         logins.classList.add('d-none')
+
     }
 }
 
@@ -275,20 +284,24 @@ links.forEach((link) => {
 });
 
 const myInput = document.getElementById("loginsSearch");
-
 myInput.addEventListener("focus", function() {
     console.log("Поле ввода получило фокус!");
     get_logins_messages(true)
     take_logins()
 });
-
 myInput.addEventListener("blur", function() {
     console.log("Поле ввода потеряло фокус!");
     get_logins_messages(false)
 });
 
-const earlySearch = document.getElementById("early_href");
+const toggleButton = document.getElementById('login_button');
+toggleButton.addEventListener('click', function () {
+    hideLogins()
+});
 
+
+
+const earlySearch = document.getElementById("early_href");
 earlySearch.addEventListener("click", function(event) {
     event.preventDefault();
     take_messages(single_message.recipient, lastMessage);

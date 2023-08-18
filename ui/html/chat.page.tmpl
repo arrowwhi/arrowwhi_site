@@ -124,9 +124,9 @@
         <div id="loginsList" class="list-group list-group-flush border-bottom scrollarea invisible">
         </div>
     </div>
-    <div class="active_early">
+    <div class="active_early d-none d-sm-block" id="message_zero">
         <div class="d-flex align-items-center justify-content-between px-2 py-1 border-bottom border-2 ">
-            <button id="login_button" class="btn btn-secondary">Скрыть</button>
+            <button id="login_button" class="btn btn-secondary .d-none .d-sm-block .d-md-none">Сообщения</button>
             <span class="text-center flex-grow-1">Логин</span>
             <img src="logo.png" alt="Логотип" class="img-fluid border" style="max-width: 50px;">
         </div>
@@ -183,7 +183,7 @@
                 message: struct.message
             };
             const newElem = createLoginMessage(messageData)
-            q = document.getElementById("messagesList")
+            const q = document.getElementById("messagesList");
             q.prepend(newElem)
 
 
@@ -195,8 +195,7 @@
 </script>
 
 <script>
-    const toggleButton = document.getElementById('login_button');
-    toggleButton.addEventListener('click', hideLogins);
+
 </script>
 
 {{end}}
