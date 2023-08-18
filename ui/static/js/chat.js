@@ -235,6 +235,16 @@ function getFromCurrentLogin(login) {
     return null
 }
 
+// функция для скрытия и показа блоков с логинами
+function hideLogins() {
+    const logins = document.getElementById('lgns')
+    if (logins.classList.contains('d-none')) {
+        logins.classList.remove('d-none')
+    } else {
+        logins.classList.add('d-none')
+    }
+}
+
 function dateTimeValidation(dateTime) {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const month = String(dateTime.getMonth() + 1);

@@ -14,7 +14,6 @@
     .chat_body {
         display: flex;
         flex: auto;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
     .active_early {
@@ -27,25 +26,14 @@
         padding: 10px; /* Добавляем отступы вокруг содержимого */
         flex-direction: column;
         justify-content: space-between;
-        height: 550px;
-    }
-
-    #early_href {
-        /*width: 100%;*/
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        padding: 10px; /* Добавляем отступы вокруг содержимого */
+        /*height: 550px;*/
     }
 
     .active_zone {
         display: flex;
         width: 100%;
-        /*height: 80%;*/
-        /*border: 2px solid #000; !* Толщина рамки и ее стиль *!*/
-        /*border-radius: 10px; !* Радиус закругления углов *!*/
-        /*box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);*/
         padding: 10px; /* Добавляем отступы вокруг содержимого */
         flex-direction: column;
-        /*justify-content: space-between;*/
         height: 500px;
     }
 
@@ -54,38 +42,11 @@
         align-items: center;
     }
 
-    .sidebar {
-        background-color: #f2f2f2;
-        height:80vh;
-        width: 200px;
-        /*padding: 0px;*/
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        justify-content: normal;
-    }
-
-    .message_list {
-        display: flex;
-        /*overflow: auto;*/
-        flex-direction: column;
-        align-items: flex-end;
-        height: 100vh;
-        justify-content: flex-end;
-        overflow-y: auto;
-    }
 
     .input_zone {
         /*display: flex;*/
         width: 100%;
 
-    }
-    .user_lnk {
-        margin: 5px 0;
-        padding: 5px;
-        border-radius: 5px;
-        background-color: #4CAF50;
-        color: white;
     }
     .chat_input {
         width: 90%;
@@ -96,18 +57,9 @@
         width: 10%;
     }
 
-    .plain_message {
-        width: 80%; /* Примерная ширина, можно изменить */
-        margin: 0 auto; /* Расположение по центру */
-        color: #626262; /* Серый цвет фона */
-        padding: 20px; /* Отступы внутри дива */
-        font-family: Arial, sans-serif; /* Шрифт */
-        font-size: 30px; /* Размер шрифта */
-        text-align: center;
-    }
 
-    .msg_class {
-        border: 0 solid #000;
+    #message_list {
+        overflow-x: auto;
     }
 
 </style>
@@ -153,8 +105,8 @@
 
 </style>
 
-<div class = "chat_body">
-    <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-body-tertiary" style="width: 350px;">
+<div class = "chat_body shadow p-1">
+    <div id="lgns" class=" flex-column flex-shrink-0" style="width: 300px;">
         <form class="d-flex mt-3 mt-lg-0" role="search">
             <input id="loginsSearch" class="form-control me-2" type="search" placeholder="Search" aria-label="Search" data-toggle="dropdown">
         </form>
@@ -165,7 +117,7 @@
                 <strong class="mb-1">{{.user}}</strong>
                 <small class="text-body-secondary">{{.create_date}}</small>
             </div>
-            <div class="col-10 mb-1 small">{{if (eq .rotation "from")}}Вы:{{end}}{{.message}}</div>
+            <div class="col-10 mb-1 small text-start">{{if (eq .rotation "from")}}<strong>Вы: </strong>{{end}}{{.message}}</div>
         </a>
         {{end}}
         </div>
@@ -173,9 +125,14 @@
         </div>
     </div>
     <div class="active_early">
+        <div class="d-flex align-items-center justify-content-between px-2 py-1 border-bottom border-2 ">
+            <button id="login_button" class="btn btn-secondary">Скрыть</button>
+            <span class="text-center flex-grow-1">Логин</span>
+            <img src="logo.png" alt="Логотип" class="img-fluid border" style="max-width: 50px;">
+        </div>
         <div id="early_href_div" class="invisible"><a href="#" id="early_href">Загрузить ранние...</a></div>
-        <div class="active_zone">
-            <div class="message_list">
+        <div class="active_zone ">
+            <div class="message_list table-responsive d-flex flex-column h-100">
                 <table class="table" id="message_list">
                     <tr>
                         <th> </th>
@@ -235,6 +192,11 @@
             console.log("ERROR: " + evt.data);
         }
     });
+</script>
+
+<script>
+    const toggleButton = document.getElementById('login_button');
+    toggleButton.addEventListener('click', hideLogins);
 </script>
 
 {{end}}
