@@ -54,6 +54,9 @@ function press_send() {
         return;
     }
     single_message.message = input.value;
+    if (single_message.message.trim() === "") {
+        return;
+    }
     console.log(`user recipient: ${single_message.recipient}`)
 
     print("Вы:", input.value, new Date());
