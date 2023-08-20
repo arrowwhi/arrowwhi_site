@@ -2,34 +2,28 @@
 
 {{define "main"}}
 <style>
-    /*body {*/
-    /*    font-family: Arial, sans-serif;*/
-    /*    margin: 0;*/
-    /*    padding: 0;*/
-    /*    flex: 1;*/
-    /*    display: flex;*/
-    /*}*/
 
+    .profile-picture-container {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        overflow: hidden;
+        position: relative;
+    }
 
     .chat_body {
         display: flex;
         flex: auto;
         flex-direction: row;
         height: 100%;
-        border: 2px solid #000; /* Толщина рамки и ее стиль */
     }
 
     .active_early {
-        display: flex;
         width: 100%;
-        /*height: 80%;*/
-        /*border: 2px solid #000; !* Толщина рамки и ее стиль *!*/
-        /*border-radius: 10px; !* Радиус закругления углов *!*/
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         padding: 10px; /* Добавляем отступы вокруг содержимого */
         flex-direction: column;
         justify-content: space-between;
-        /*height: 550px;*/
     }
 
     .active_zone {
@@ -37,8 +31,6 @@
         width: 100%;
         padding: 10px; /* Добавляем отступы вокруг содержимого */
         flex-direction: column;
-        /*height: 500px;*/
-        height: 77%;
     }
 
     .input_container {
@@ -46,12 +38,6 @@
         align-items: center;
     }
 
-
-    .input_zone {
-        /*display: flex;*/
-        width: 100%;
-
-    }
     .chat_input {
         width: 90%;
         margin-right: 10px;
@@ -106,11 +92,16 @@
         height: 0;
     }
 
-
 </style>
 
-<div class = "container-fluid vh-100  chat_body shadow p-1">
-    <div id="lgns" class=" flex-column flex-shrink-0 col-12 col-md-6" >
+<audio id="sound">
+    <source src="/sounds/message_alarm.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+
+<div class = "container-fluid  chat_body shadow p-1">
+    <div id="lgns" class="col-12 col-md-3 d-lg-block" >
         <form class="d-flex mt-3 mt-lg-0" role="search">
             <input id="loginsSearch" class="form-control me-2" type="search" placeholder="Search" aria-label="Search" data-toggle="dropdown">
         </form>
@@ -131,12 +122,12 @@
     <div class="active_early d-none d-sm-block" id="message_zero">
         <div class="d-flex align-items-center justify-content-between px-2 py-1 border-bottom border-2 ">
             <button id="login_button" class="btn btn-secondary .d-none .d-sm-block .d-md-none">Сообщения</button>
-            <span class="text-center flex-grow-1">Логин</span>
-            <img src="logo.png" alt="Логотип" class="img-fluid border" style="max-width: 50px;">
+            <span id="MessageListProfileName" class="text-center flex-grow-1">Логин</span>
+            <img src="/profiles/default.jpg" id="MessageListProfilePhoto" alt="Логотип" class="img-fluid border profile-picture-container" style="max-width: 50px;">
         </div>
+        <div class="active_zone h-75">
         <div id="early_href_div" class="invisible"><a href="#" id="early_href">Загрузить ранние...</a></div>
-        <div class="active_zone ">
-            <div class="message_list table-responsive d-flex flex-column h-100">
+            <div class="message_list table-responsive d-flex flex-column h-75">
                 <table class="table" id="message_list">
                     <tr>
                         <th> </th>
@@ -145,12 +136,20 @@
                     </tr>
                 </table>
             </div>
-            <div class="input_zone">
-                <div class="input_container">
-                    <input class="form-control chat_input" id="chat_input" type="text" placeholder="Пишите тут..." onkeydown="checkEnter(event)">
-                    <input id="send" class="btn btn-light chat_button" type="submit" value="Отправить" onclick="press_send(event)" />
-                </div>
+        </div>
+        <div class="input_container">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    +
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Фото</a></li>
+                    <li><a class="dropdown-item" href="#">Видео</a></li>
+                    <li><a class="dropdown-item" href="#">Файл</a></li>
+                </ul>
             </div>
+            <input class="form-control chat_input " id="chat_input" type="text" placeholder="Пишите тут..." onkeydown="checkEnter(event)">
+            <input id="send" class="btn btn-light chat_button" type="submit" value="Отправить" onclick="press_send(event)" />
         </div>
     </div>
 </div>
@@ -170,6 +169,8 @@
             ws = null;
         }
         ws.onmessage = function(evt) {
+            const sound = document.getElementById("sound");
+            sound.play()
             const struct = JSON.parse(evt.data);
             console.log(evt.data)
             if (struct.user_from === single_message.recipient) {
@@ -182,24 +183,17 @@
                 elem.remove()
             }
             const messageData = {
-                user: struct.user_from, // struct.user_from,
+                user: struct.user_from,
                 create_date: dateTimeValidation(new Date()),
                 message: struct.message
             };
             const newElem = createLoginMessage(messageData)
             const q = document.getElementById("messagesList");
             q.prepend(newElem)
-
-
         }
         ws.onerror = function(evt) {
             console.log("ERROR: " + evt.data);
         }
     });
 </script>
-
-<script>
-
-</script>
-
 {{end}}

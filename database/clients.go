@@ -6,11 +6,12 @@ import (
 )
 
 type Client struct {
-	Login      string    `gorm:"type:varchar;primaryKey;unique"`
-	FirstName  string    `gorm:"type:varchar"`
-	LastName   string    `gorm:"type:varchar"`
-	Password   string    `gorm:"type:varchar;not null"`
-	CreateDate time.Time `gorm:"default:CURRENT_TIMESTAMP"`
+	Login        string    `gorm:"type:varchar;primaryKey;unique"`
+	FirstName    string    `gorm:"type:varchar"`
+	LastName     string    `gorm:"type:varchar"`
+	Password     string    `gorm:"type:varchar;not null"`
+	CreateDate   time.Time `gorm:"default:CURRENT_TIMESTAMP"`
+	ProfilePhoto string    `gorm:"type:varchar;default null"`
 }
 
 func (dbe *DbEngine) SelectClientByLogin(login string) (*Client, error) {
@@ -19,6 +20,10 @@ func (dbe *DbEngine) SelectClientByLogin(login string) (*Client, error) {
 		return nil, err
 	}
 	return &client, nil
+}
+
+func (dbe *DbEngine) ChangeProfilePhoto(login, path string) error {
+	return dbe.db.Model(&Client{}).Where("login = ?", login).Update("profile_photo", path[10:]).Error
 }
 
 func (dbe *DbEngine) UpdateClientPassword(login string, newPass string) error {

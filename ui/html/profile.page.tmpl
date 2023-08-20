@@ -1,0 +1,209 @@
+{{template "base" .}}
+
+{{define "main"}}
+
+    <style>
+        .profile-picture-container {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .profile-picture {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: filter 0.3s;
+        }
+
+        .profile-picture-container:hover .profile-picture {
+            filter: brightness(50%);
+        }
+
+        .hover-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 16px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .profile-picture-container:hover .hover-text {
+            opacity: 1;
+        }
+
+
+        .profile-card {
+            display: inline-block;
+            text-align: center;
+        }
+
+        .profile-picture-container {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .profile-picture {
+            max-width: 200px;
+            vertical-align: middle;
+        }
+
+        .hover-text {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .profile-picture-container:hover .hover-text {
+            display: block;
+        }
+
+        .inline-input {
+            display: inline-block;
+            width: calc(50% - 10px);
+            margin-right: 20px;
+        }
+
+        .mt-3 {
+            margin-top: 20px;
+        }
+
+        /*@media (max-width: 767px) { !* Примерная граница для смены макета *!*/
+        /*    .flex-wrap {*/
+        /*        flex-direction: column !important;*/
+        /*    }*/
+        /*}*/
+
+
+    </style>
+
+<div class="container-fluid">
+    <div class="row border-bottom-5 shadow p-2">
+        <h1>Настройки профиля</h1>
+    </div>
+    <div class="row">
+        <div class="col-lg-2 d-none d-lg-block pe-3 p-0"> <!-- Меню для больших экранов -->
+            <div class="bd-links w-100">
+                <button type="button" class="list-group-item list-group-item-action">Профиль</button>
+                <button type="button" class="list-group-item list-group-item-action">Сменить пароль</button>
+            </div>
+        </div>
+        <div class="col-lg-3 d-lg-none">
+            <div class="offcanvas offcanvas-start position-fixed" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="sidebarLabel">Меню</h5>
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body p-0">
+                    <nav class="bd-links w-100" aria-label="Docs navigation">
+                        <button type="button" class="list-group-item list-group-item-action">Профиль</button>
+                        <button type="button" class="list-group-item list-group-item-action">Сменить пароль</button>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg">
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="text-center profile-card">
+                            <div class="profile-picture-container">
+                                <img src="{{.Photo}}" alt="Фото профиля" class="profile-picture" id="profile-picture" style="max-width: 200px;">
+                                <span class="hover-text">Изменить</span>
+                            </div>
+                            <div class="mt-9">
+                                <div class="d-flex flex-row justify-content-between align-items-center flex-wrap">
+                                    <label>
+                                        <input type="text" class="form-control mb-2 ms-1 nameChanger" placeholder="Имя" value="{{.FName}}" disabled>
+                                    </label>
+                                    <label>
+                                        <input type="text" class="form-control mb-2 ms-1 nameChanger" placeholder="Фамилия" value="{{.LName}}" disabled>
+                                    </label>
+                                    <button class="btn btn-primary mb-2 ms-1" id="ChangeName" onclick="PressChangeName()">Изменить</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    function PressChangeName() {
+        const btn=document.getElementById("ChangeName")
+        if (btn.innerText==="Изменить") {
+            btn.innerText="Сохранить"
+            const inputs=document.querySelectorAll(".nameChanger")
+            inputs.forEach(function (input) {
+                input.disabled=false
+            })
+        } else {
+            btn.innerText="Изменить"
+            const inputs=document.querySelectorAll("input")
+            inputs.forEach(function (input) {
+                input.disabled=true
+            })
+        }
+    }
+
+    function openImageFilePicker(maxSizeInBytes) {
+        const inputElement = document.createElement("input");
+        inputElement.type = "file";
+        inputElement.accept = "image/jpeg, image/png, image/jpg"; // Типы принимаемых файлов
+        inputElement.addEventListener("change", function(event) {
+            const selectedFile = event.target.files[0];
+
+            if (selectedFile) {
+                if (selectedFile.size <= maxSizeInBytes) {
+                    uploadFileToServer(selectedFile)
+                    console.log("Выбран файл: ", selectedFile.name);
+
+                } else {
+                    alert("Выбранный файл слишком большой. Максимальный размер: " + (maxSizeInBytes / (1024 * 1024)) + " MB");
+                }
+            }
+        });
+        inputElement.click();
+    }
+
+    function uploadFileToServer(file) {
+        const formData = new FormData();
+        formData.append("image", file); // "image" - это имя поля, которое сервер ожидает
+
+        fetch("/profile/change_photo", {
+            method: "POST",
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Обработка ответа сервера после успешной загрузки
+                console.log("Ответ сервера: ", data);
+            })
+            .catch(error => {
+                // Обработка ошибки
+                console.error("Произошла ошибка при загрузке файла: ", error);
+            });
+    }
+    const pic = document.getElementById("profile-picture")
+    pic.addEventListener("click", function() {
+        openImageFilePicker(1024*1024*1024)
+    })
+</script>
+
+{{end}}

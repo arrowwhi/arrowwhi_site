@@ -116,6 +116,37 @@ func ChessHandler(c echo.Context) error {
 	return err
 }
 
+func ProfileHandler(c echo.Context) error {
+	var username = ""
+	cookie, err := c.Cookie("token")
+	if err == nil {
+		username, err = auth.VerifyAndExtractUsername(cookie.Value)
+	}
+	user, err := database.Get().SelectClientByLogin(username)
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+	if (user.ProfilePhoto == "") || (user.ProfilePhoto == "null") {
+		user.ProfilePhoto = "/profiles/default.jpg"
+	}
+
+	// Данные для передачи в шаблон
+	data := map[string]interface{}{
+		"title":     "Профиль",
+		"LoginInfo": username,
+		"FName":     user.FirstName,
+		"LName":     user.LastName,
+		"Photo":     user.ProfilePhoto,
+	}
+
+	err = renderBase(c, "profile.page.tmpl", data)
+	if err != nil {
+		log.Error(err.Error())
+	}
+	return err
+}
+
 func LogoutHandler(c echo.Context) error {
 	cookie := &http.Cookie{
 		Name:    "token",

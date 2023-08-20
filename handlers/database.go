@@ -3,7 +3,9 @@ package handlers
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
+	"io"
 	"net/http"
+	"os"
 	"site/auth"
 	"site/database"
 )
@@ -36,8 +38,19 @@ func GetMessagesHistory(c echo.Context) error {
 	// Здесь вы можете использовать message.Username и message.LastID
 	// для выполнения нужных действий в вашем приложении
 	// Возвращаем ответ
+	user, err := database.Get().SelectClientByLogin(input.Username)
+	if err != nil {
+		return err
+	}
+	if user.ProfilePhoto == "" {
+		user.ProfilePhoto = "/profiles/default.jpg"
+	}
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"status":   "success",
+		"status": "success",
+		"name":   user.FirstName + " " + user.LastName,
+		"photo":  user.ProfilePhoto,
+
 		"messages": msgs,
 	})
 }
@@ -67,5 +80,58 @@ func GetLogins(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status": "success",
 		"logins": logins,
+	})
+}
+
+func ChangeProfilePhoto(c echo.Context) error {
+	var username = ""
+	cookie, err := c.Cookie("token")
+	if err == nil {
+		username, err = auth.VerifyAndExtractUsername(cookie.Value)
+		if err != nil {
+			log.Error(err.Error())
+			return err
+		}
+	} else {
+		return err
+	}
+
+	// Получаем файл из POST-запроса
+	file, err := c.FormFile("image")
+	if err != nil {
+		return c.String(http.StatusBadRequest, "Error reading the file")
+	}
+
+	// Открываем файл на диске для записи
+	src, err := file.Open()
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Error opening the file")
+	}
+	defer src.Close()
+	path := "ui/static/profiles/"
+
+	// Создаем файл на диске для сохранения изображения
+	dst, err := os.Create(path + username + ".jpg")
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Error creating the file")
+	}
+	defer dst.Close()
+
+	// Копируем данные из файла запроса в файл на диске
+	_, err = io.Copy(dst, src)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Error copying file data")
+	}
+
+	err = database.Get().ChangeProfilePhoto(username, dst.Name())
+	if err != nil {
+		return err
+	}
+	if err := database.Get().ChangeProfilePhoto(username, dst.Name()); err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"status": "success",
+		"path":   dst.Name(),
 	})
 }

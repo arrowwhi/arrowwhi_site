@@ -6,16 +6,10 @@
         <title>{{ .title }}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
-        <style>
-            .main {
-                padding-top: 70px;
-                width: 100%;
-            }
-        </style>
     </head>
-    <body id = "main_body" class="text-center main_body">
+    <body id = "main_body" class="d-flex flex-column text-center main_body vh-100">
         {{template "header" .}}
-        <main class="main">
+        <main class="main vh-100">
             {{template "main" .}}
         </main>
 {{/*        {{template "footer" .}}*/}}

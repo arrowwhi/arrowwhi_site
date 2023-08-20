@@ -50,6 +50,7 @@ func main() {
 	e.GET("/reg", handlers.RegHandler)
 	e.GET("/chat", handlers.ChatTemplateHandler)
 	e.GET("/chess", handlers.ChessHandler)
+	e.GET("/profile", handlers.ProfileHandler)
 	//e.GET("/markdown")
 
 	//e.POST("/markdown", md.MarkdownHandler)
@@ -58,6 +59,7 @@ func main() {
 	e.POST("/database/get_messages", handlers.GetMessagesHistory)
 	e.POST("/feedback/add", handlers.TakeFeedback)
 	e.POST("/database/get_logins", handlers.GetLogins)
+	e.POST("/profile/change_photo", handlers.ChangeProfilePhoto)
 
 	e.Logger.Fatal(e.Start(os.Getenv("STANDARTPORT")))
 

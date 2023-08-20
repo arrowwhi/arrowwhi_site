@@ -93,6 +93,11 @@ async function take_messages(usr, last) {
         .then(data => {
             console.log(data)
             // Обработка полученных данных
+            const loginPlace = document.getElementById('MessageListProfileName')
+            loginPlace.textContent = data.name
+            const photoPlace = document.getElementById('MessageListProfilePhoto')
+            photoPlace.src = data.photo
+
             for (let elem of data.messages) {
                 const dateTime = new Date(elem.create_date)
                 lastMessage = elem.id
@@ -305,8 +310,6 @@ const toggleButton = document.getElementById('login_button');
 toggleButton.addEventListener('click', function () {
     hideLogins()
 });
-
-
 
 const earlySearch = document.getElementById("early_href");
 earlySearch.addEventListener("click", function(event) {
