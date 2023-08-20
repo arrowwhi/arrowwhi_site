@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"io"
@@ -35,12 +36,13 @@ func GetMessagesHistory(c echo.Context) error {
 		})
 	}
 	msgs := database.Get().SelectMessages(input.Username, username, input.Count, input.LastId)
-	// Здесь вы можете использовать message.Username и message.LastID
-	// для выполнения нужных действий в вашем приложении
-	// Возвращаем ответ
+	fmt.Println(msgs)
 	user, err := database.Get().SelectClientByLogin(input.Username)
 	if err != nil {
-		return err
+		return c.JSON(http.StatusServiceUnavailable, map[string]string{
+			"status": "error",
+			"error":  err.Error(),
+		})
 	}
 	if user.ProfilePhoto == "" {
 		user.ProfilePhoto = "/profiles/default.jpg"
@@ -108,6 +110,7 @@ func ChangeProfilePhoto(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "Error opening the file")
 	}
 	defer src.Close()
+
 	path := "ui/static/profiles/"
 
 	// Создаем файл на диске для сохранения изображения
@@ -133,5 +136,30 @@ func ChangeProfilePhoto(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status": "success",
 		"path":   dst.Name(),
+	})
+}
+
+func MessagesMakeRead(c echo.Context) error {
+	input := new(struct {
+		UserFrom string `json:"user_from"`
+		UserTo   string `json:"user_to"`
+	})
+
+	if err := c.Bind(input); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"status": "error",
+			"error":  "Invalid request body",
+		})
+	}
+
+	if err := database.Get().MakeMessagesRead(input.UserFrom, input.UserTo); err != nil {
+		return c.JSON(http.StatusServiceUnavailable, map[string]string{
+			"status": "error",
+			"error":  err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"status": "success",
 	})
 }

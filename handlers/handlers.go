@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"html/template"
@@ -8,15 +9,15 @@ import (
 	"net/http"
 	"site/auth"
 	"site/database"
+	"strings"
 	"time"
 )
 
-// TemplateRenderer представляет собой структуру, реализующую интерфейс echo.Renderer
 type TemplateRenderer struct {
 	templates *template.Template
 }
 
-// Render выполняет рендеринг шаблона и возвращает результат
+// Render выполняет рендеринг шаблона
 func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}) error {
 	return t.templates.ExecuteTemplate(w, name, data)
 }
@@ -76,7 +77,6 @@ func ChatTemplateHandler(c echo.Context) error {
 
 func LoginHandler(c echo.Context) error {
 
-	// Данные для передачи в шаблон
 	data := map[string]interface{}{
 		"title": "Авторизация",
 	}
@@ -90,7 +90,6 @@ func LoginHandler(c echo.Context) error {
 
 func RegHandler(c echo.Context) error {
 
-	// Данные для передачи в шаблон
 	data := map[string]interface{}{
 		"title": "Регистрация",
 	}
@@ -104,7 +103,6 @@ func RegHandler(c echo.Context) error {
 
 func ChessHandler(c echo.Context) error {
 
-	// Данные для передачи в шаблон
 	data := map[string]interface{}{
 		"title": "Шахматы",
 	}
@@ -122,7 +120,8 @@ func ProfileHandler(c echo.Context) error {
 	if err == nil {
 		username, err = auth.VerifyAndExtractUsername(cookie.Value)
 	}
-	user, err := database.Get().SelectClientByLogin(username)
+	fmt.Println("\n\n\n" + strings.TrimSpace(username) + "\n\n\n")
+	user, err := database.Get().SelectClientByLogin(strings.TrimSpace(username))
 	if err != nil {
 		log.Error(err.Error())
 		return err
@@ -131,7 +130,6 @@ func ProfileHandler(c echo.Context) error {
 		user.ProfilePhoto = "/profiles/default.jpg"
 	}
 
-	// Данные для передачи в шаблон
 	data := map[string]interface{}{
 		"title":     "Профиль",
 		"LoginInfo": username,
@@ -171,5 +169,4 @@ func renderBase(c echo.Context, page string, data map[string]interface{}) error 
 		return err
 	}
 	return err
-
 }

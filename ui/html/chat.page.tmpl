@@ -52,6 +52,11 @@
         overflow-x: auto;
     }
 
+    #messagesList.scrollarea {
+        max-height: 84vh;
+        overflow-y: auto;
+    }
+
 </style>
 
 <style>
@@ -88,7 +93,6 @@
     }
 
     .invisible {
-        /*display: none;*/
         height: 0;
     }
 
@@ -107,9 +111,14 @@
         </form>
         <div id="messagesList" class="list-group list-group-flush border-bottom scrollarea">
         {{range .logins}}
-        <a href="#" class="list-group-item list-group-item-action py-3 lh-sm login_click col-12 col-md-6">
-            <div class="d-flex w-100 align-items-center justify-content-between">
+        <a href="#" class="list-group-item list-group-item-action py-3 lh-sm login_click col-12 col-md-6 ">
+
+            <div class="d-flex w-100 align-items-center justify-content-between position-relative">
                 <strong class="mb-1">{{.user}}</strong>
+                <span class="top-100 start-50 translate-middle badge rounded-pill bg-danger {{if eq .unread 0}}d-none{{end}}">
+    {{.unread}}
+    <span class="visually-hidden">непрочитанные сообщения</span>
+  </span>
                 <small class="text-body-secondary">{{.create_date}}</small>
             </div>
             <div class="col-10 mb-1 small text-start">{{if (eq .rotation "from")}}<strong>Вы: </strong>{{end}}{{.message}}</div>
@@ -121,7 +130,8 @@
     </div>
     <div class="active_early d-none d-sm-block" id="message_zero">
         <div class="d-flex align-items-center justify-content-between px-2 py-1 border-bottom border-2 ">
-            <button id="login_button" class="btn btn-secondary .d-none .d-sm-block .d-md-none">Сообщения</button>
+            <button id="login_button" class="btn btn-secondary position-relative">Сообщения
+            </button>
             <span id="MessageListProfileName" class="text-center flex-grow-1">Логин</span>
             <img src="/profiles/default.jpg" id="MessageListProfilePhoto" alt="Логотип" class="img-fluid border profile-picture-container" style="max-width: 50px;">
         </div>

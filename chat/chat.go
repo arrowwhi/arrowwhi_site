@@ -49,6 +49,14 @@ func ChatHandler(c echo.Context) error {
 
 		switch rawData["m_type"].(string) {
 		case "message":
+			if rawData["recipient"].(string) == "" {
+				log.Println("Не указан получатель")
+				continue
+			} else if rawData["message"].(string) == "" {
+				log.Println("Не указано сообщение")
+				continue
+			}
+
 			newMessage := database.Get().AddMessage(
 				rawData["message"].(string),
 				username,

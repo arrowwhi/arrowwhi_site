@@ -8,7 +8,7 @@ let single_message = {
     "recipient": "",
 }
 
-// Функция для создания структуры тегов для сообщения
+// Функция для создания сообщения
 function createMessage(author, messageText, dateTime) {
     const newRow = document.createElement("tr");
     // Создание ячеек <th> и <td> для новой строки

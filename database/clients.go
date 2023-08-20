@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -16,6 +17,7 @@ type Client struct {
 
 func (dbe *DbEngine) SelectClientByLogin(login string) (*Client, error) {
 	var client Client
+	login = strings.TrimSpace(login)
 	if err := dbe.db.Where("login = ?", login).First(&client).Error; err != nil {
 		return nil, err
 	}
@@ -55,8 +57,31 @@ func (dbe *DbEngine) GetLogins() ([]string, error) {
 }
 
 func (dbe *DbEngine) GetLoginsToLine(login string) []map[string]interface{} {
-	query := fmt.Sprintf("select  case when user_to = '%s' then 'to' else 'from' end as rotation, case when user_to = '%s' then user_from else user_to end as user, message, is_read, create_date from (select usr, MAX(id) as max_id from (select id, user_from as usr from messages where user_to = '%s' union all select id, user_to as usr from messages where user_from = '%s') as mgs group by usr) as uniq_usrs join messages m on m.id = uniq_usrs.max_id order by create_date desc;", login, login, login, login)
+	query := fmt.Sprintf("with unread as ("+
+		"select user_from as \"user\", count(*) as unread from messages "+
+		"where \"user_to\" = '%s' and is_read = false "+
+		"group by \"user_from\" "+
+		") "+
+		"select case when user_to = '%s' then 'to' else 'from' end as rotation, "+
+		"       case when user_to = '%s' then user_from else user_to end as \"user\", "+
+		"       message, "+
+		"       COALESCE(ur.unread, 0) AS unread, "+
+		"       create_date "+
+		"from (select usr, MAX(id) as max_id "+
+		"      from (select id, user_from as usr "+
+		"            from messages "+
+		"            where user_to = '%s' "+
+		"            union all "+
+		"            select id, user_to as usr "+
+		"            from messages "+
+		"            where user_from = '%s') as mgs "+
+		"      group by usr) as uniq_usrs "+
+		"         join messages m on m.id = uniq_usrs.max_id "+
+		"        left join unread ur on ur.\"user\" = uniq_usrs.usr;", login, login, login, login, login)
 	var results []map[string]interface{}
 	dbe.db.Raw(query).Scan(&results)
+	for _, v := range results {
+		fmt.Println(v)
+	}
 	return results
 }
