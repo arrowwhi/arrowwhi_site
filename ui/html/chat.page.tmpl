@@ -70,6 +70,10 @@
         padding: 5px;
     }
 
+    .table tr.unread {
+        background-color: #d35454;
+    }
+
     .table th:first-child,
     .table td:first-child,
     .table th:nth-child(2),
@@ -117,7 +121,7 @@
                 <strong class="mb-1">{{.user}}</strong>
                 <span class="top-100 start-50 translate-middle badge rounded-pill bg-danger {{if eq .unread 0}}d-none{{end}}">
     {{.unread}}
-    <span class="visually-hidden">непрочитанные сообщения</span>
+{{/*    <span class="visually-hidden">непрочитанные сообщения</span>*/}}
   </span>
                 <small class="text-body-secondary">{{.create_date}}</small>
             </div>
@@ -130,7 +134,7 @@
     </div>
     <div class="active_early d-none d-sm-block" id="message_zero">
         <div class="d-flex align-items-center justify-content-between px-2 py-1 border-bottom border-2 ">
-            <button id="login_button" class="btn btn-secondary position-relative">Сообщения
+            <button id="login_button" class="btn btn-secondary position-relative d-lg-none">Сообщения
             </button>
             <span id="MessageListProfileName" class="text-center flex-grow-1">Логин</span>
             <img src="/profiles/default.jpg" id="MessageListProfilePhoto" alt="Логотип" class="img-fluid border profile-picture-container" style="max-width: 50px;">
@@ -177,33 +181,41 @@
         ws.onclose = function() {
             console.log("CLOSE");
             ws = null;
+            setTimeout(function() {
+                document.location.reload();
+            }, 2000);
         }
         ws.onmessage = function(evt) {
-            const sound = document.getElementById("sound");
-            sound.play()
             const struct = JSON.parse(evt.data);
             console.log(evt.data)
-            if (struct.user_from === single_message.recipient) {
-                print(`${struct.user_from}:`, " " + struct.message, new Date());
+
+            if (struct.m_type === "take_id_from_local") {
+                if (struct.local_id in pendingResponses) {
+                    const d = pendingResponses[struct.local_id]
+                    d.setAttribute('data-message-id', struct.id);
+                    delete pendingResponses[struct.local_id];
+                }
+            } else if (struct.m_type === "make_read") {
+                MarkAsRead(struct.id)
             } else {
-                console.log(struct.from, struct.message)
+                const sound = document.getElementById("sound");
+                sound.play()
+                if (struct.user_from === single_message.user_to) {
+                    print(struct);
+                    ws.send(JSON.stringify({
+                        m_type: "read_message",
+                        ids: [struct.id]
+                    }));
+                } else {
+                    console.log(struct.from, struct.message)
+                }
+                GetNewMessageOnLoginList(struct)
             }
-            const elem = getFromCurrentLogin(struct.user_from)
-            if (elem) {
-                elem.remove()
-            }
-            const messageData = {
-                user: struct.user_from,
-                create_date: dateTimeValidation(new Date()),
-                message: struct.message
-            };
-            const newElem = createLoginMessage(messageData)
-            const q = document.getElementById("messagesList");
-            q.prepend(newElem)
         }
         ws.onerror = function(evt) {
             console.log("ERROR: " + evt.data);
         }
+
     });
 </script>
 {{end}}

@@ -139,27 +139,42 @@ func ChangeProfilePhoto(c echo.Context) error {
 	})
 }
 
-func MessagesMakeRead(c echo.Context) error {
-	input := new(struct {
-		UserFrom string `json:"user_from"`
-		UserTo   string `json:"user_to"`
-	})
-
-	if err := c.Bind(input); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"status": "error",
-			"error":  "Invalid request body",
-		})
-	}
-
-	if err := database.Get().MakeMessagesRead(input.UserFrom, input.UserTo); err != nil {
-		return c.JSON(http.StatusServiceUnavailable, map[string]string{
-			"status": "error",
-			"error":  err.Error(),
-		})
-	}
-
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"status": "success",
-	})
-}
+//func MessagesMakeRead(c echo.Context) error {
+//
+//	input := new(struct {
+//		Ids []int `json:"ids"`
+//	})
+//
+//	if err := c.Bind(input); err != nil {
+//		return c.JSON(http.StatusBadRequest, map[string]string{
+//			"status": "error",
+//			"error":  "Invalid request body",
+//		})
+//	}
+//
+//	ids, err := database.Get().MakeMessagesRead(input.Ids)
+//	if err != nil {
+//		return c.JSON(http.StatusServiceUnavailable, map[string]string{
+//			"status": "error",
+//			"error":  err.Error(),
+//		})
+//	}
+//
+//	//TODO переделать жeсткий костыль
+//	for _, v := range ids {
+//		msg, err := database.Get().SelectMessageById(v)
+//		if err != nil {
+//			log.Print(err.Error())
+//			continue
+//		}
+//		chat.SendRead(msg.From, msg.ID)
+//		chat.SendRead(msg.To, msg.ID)
+//
+//	}
+//
+//	return c.JSON(http.StatusOK, map[string]interface{}{
+//		"status": "success",
+//		"count":  len(input.Ids),
+//		"ids":    ids,
+//	})
+//}

@@ -2,6 +2,7 @@ package database
 
 import (
 	"github.com/labstack/gommon/log"
+	"strings"
 	"time"
 )
 
@@ -18,27 +19,30 @@ type Message struct {
 
 func (dbe *DbEngine) AddMessage(message, from, to string) Message {
 	msg := Message{
-		From:    from,
-		To:      to,
-		Message: message,
+		From:    strings.TrimSpace(from),
+		To:      strings.TrimSpace(to),
+		Message: strings.TrimSpace(message),
 	}
-	queueMessages <- msg
+	if err := dbe.db.Create(&msg).Error; err != nil {
+		log.Error(err.Error())
+	}
 	return msg
 }
 
-func (dbe *DbEngine) processQueue() {
-	for {
-		msg := <-queueMessages
-		if err := dbe.db.Create(&msg).Error; err != nil {
-			log.Error(err.Error())
-		}
-	}
-}
+//func (dbe *DbEngine) processQueue() {
+//	for {
+//		msg := <-queueMessages
+//		if err := dbe.db.Create(&msg).Error; err != nil {
+//			log.Error(err.Error())
+//		}
+//	}
+//}
 
 // SelectMessages Метод для выборки сообщений из базы данных
 func (dbe *DbEngine) SelectMessages(from, to string, count, firstID int) []Message {
 	var messages []Message
-
+	from = strings.TrimSpace(from)
+	to = strings.TrimSpace(to)
 	query := dbe.db.Where("(\"user_from\" = ? AND \"user_to\" = ?) OR (\"user_from\" = ? AND \"user_to\" = ?)", from, to, to, from)
 	if firstID != 0 {
 		query = query.Where("id < ?", firstID)
@@ -55,20 +59,51 @@ func (dbe *DbEngine) SelectMessages(from, to string, count, firstID int) []Messa
 	return messages
 }
 
-func (dbe *DbEngine) FindUsersWithMessages(user string) ([]string, error) {
-	var users []string
+//func (dbe *DbEngine) FindUsersWithMessages(user string) ([]string, error) {
+//	var users []string
+//
+//	// Подзапросы для получения имен пользователей с сообщениями
+//	subQueryFrom := dbe.db.Model(&Message{}).Select("DISTINCT `from`").Where("to = ?", user)
+//	subQueryTo := dbe.db.Model(&Message{}).Select("DISTINCT `to`").Where("from = ?", user)
+//
+//	// Объединение подзапросов с помощью OR
+//	query := dbe.db.Model(&Message{}).Select("DISTINCT `from`").Where("? IN ?", user, subQueryFrom).
+//		Or(dbe.db.Model(&Message{}).Select("DISTINCT `from`").Where("? IN ?", user, subQueryTo)).
+//		Pluck("from", &users)
+//
+//	if query.Error != nil {
+//		return nil, query.Error
+//	}
+//	return users, nil
+//}
 
-	// Подзапросы для получения имен пользователей с сообщениями
-	subQueryFrom := dbe.db.Model(&Message{}).Select("DISTINCT `from`").Where("to = ?", user)
-	subQueryTo := dbe.db.Model(&Message{}).Select("DISTINCT `to`").Where("from = ?", user)
+func (dbe *DbEngine) MakeMessagesRead(ids []int) ([]int, error) {
+	// Обновляем статус сообщений
+	updateQuery := dbe.db.Model(&Message{}).
+		Where("id IN (?)", ids).
+		Update("is_read", true)
 
-	// Объединение подзапросов с помощью OR
-	query := dbe.db.Model(&Message{}).Select("DISTINCT `from`").Where("? IN ?", user, subQueryFrom).
-		Or(dbe.db.Model(&Message{}).Select("DISTINCT `from`").Where("? IN ?", user, subQueryTo)).
-		Pluck("from", &users)
-
-	if query.Error != nil {
-		return nil, query.Error
+	if updateQuery.Error != nil {
+		return nil, updateQuery.Error
 	}
-	return users, nil
+
+	// Получаем обновленные идентификаторы
+	var updatedIDs []int
+	selectQuery := dbe.db.Model(&Message{}).
+		Where("id IN (?) AND is_read = ?", ids, true).
+		Pluck("id", &updatedIDs)
+
+	if selectQuery.Error != nil {
+		return nil, selectQuery.Error
+	}
+
+	return updatedIDs, nil
+}
+
+func (dbe *DbEngine) SelectMessageById(id int) (*Message, error) {
+	var message Message
+	if err := dbe.db.Where("id = ?", id).First(&message).Error; err != nil {
+		return nil, err
+	}
+	return &message, nil
 }

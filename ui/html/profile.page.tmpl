@@ -79,11 +79,6 @@
             margin-top: 20px;
         }
 
-        /*@media (max-width: 767px) { !* Примерная граница для смены макета *!*/
-        /*    .flex-wrap {*/
-        /*        flex-direction: column !important;*/
-        /*    }*/
-        /*}*/
 
 
     </style>
@@ -184,7 +179,7 @@
 
     function uploadFileToServer(file) {
         const formData = new FormData();
-        formData.append("image", file); // "image" - это имя поля, которое сервер ожидает
+        formData.append("image", file);
 
         fetch("/profile/change_photo", {
             method: "POST",
@@ -192,11 +187,9 @@
         })
             .then(response => response.json())
             .then(data => {
-                // Обработка ответа сервера после успешной загрузки
                 console.log("Ответ сервера: ", data);
             })
             .catch(error => {
-                // Обработка ошибки
                 console.error("Произошла ошибка при загрузке файла: ", error);
             });
     }

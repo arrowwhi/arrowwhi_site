@@ -1,16 +1,25 @@
 const input = document.getElementById("chat_input");
 const output = document.getElementById("message_list");
 let ws;
+let pendingResponses = {};
+
 
 let single_message = {
+    "id": 0,
     "m_type": "message",
     "message": "",
-    "recipient": "",
+    "user_to": "",
+    "user_from": "You",
+    "is_read": false,
+    "create_date": ""
 }
 
 // Функция для создания сообщения
-function createMessage(author, messageText, dateTime) {
+function createMessage(author, messageText, dateTime, read) {
     const newRow = document.createElement("tr");
+    if (!read) {
+        newRow.classList.add("unread")
+    }
     // Создание ячеек <th> и <td> для новой строки
     const thCell = document.createElement("th");
     thCell.textContent = author; // Здесь можно указать имя
@@ -27,24 +36,38 @@ function createMessage(author, messageText, dateTime) {
 }
 
 // функция для печати сообщений снизу
-const print = function (author, message, time) {
-    const d = createMessage(author, message, time)
+const print = function (elem) {
+    const d = createMessage(elem.user_from, elem.message, elem.create_date, elem.is_read)
     output.appendChild(d);
+    if (elem.id !== 0) {
+        d.setAttribute('data-message-id', elem.id);
+        ws.send(JSON.stringify({
+            m_type: "read_message",
+            ids: [elem.id]
+        }));
+    }
     output.scroll(0, output.scrollHeight);
     const msgs = document.getElementById('message_list')
-    console.log(msgs)
     msgs.scrollTop = msgs.scrollHeight;
+    return d
 };
 
 // функция для печати сообщений сверху
-const print_forward = function (author, message, time) {
-    const d = createMessage(author, message, time);
+const print_forward = function (elem) {
+    const dateTime = new Date(elem.create_date)
+    const d = createMessage(elem.user_from, elem.message, dateTime, elem.is_read);
+    d.setAttribute('data-message-id', elem.id);
+    if (elem.user_from === single_message.user_to && !elem.is_read) {
+        ws.send(JSON.stringify({
+            m_type: "read_message",
+            ids: [elem.id]
+        }));
+    }
     output.prepend(d);
     output.scroll(0, output.scrollHeight);
-
 };
 
-//проверка евента на нажатую клаишу enter           - ?
+//проверка эвента на нажатую клаишу enter           - ?
 function checkEnter(evt) {
     if (event.key === "Enter") {
         event.preventDefault();
@@ -55,20 +78,27 @@ function checkEnter(evt) {
 // отправка сообщения на сервер
 function press_send() {
     if (!ws) {
+        console.log("No connection");
         return;
     }
     single_message.message = input.value;
-    if (single_message.message.trim() === "") {
+    if (single_message.message.trim() === "" || single_message.user_to.trim() === "") {
+        console.log("Empty message");
         return;
     }
-    console.log(`user recipient: ${single_message.recipient}`)
+    console.log(`user user_to: ${single_message.user_to}`)
 
-    print("Вы:", input.value, new Date());
+
+    single_message.create_date = new Date().toISOString();
+    // TODO поправить формированиие локал ид
+    single_message.local_id = Math.random()
+    const d = print(single_message);
     console.log("SEND: " + JSON.stringify(single_message));
     ws.send(JSON.stringify(single_message));
+    pendingResponses[single_message.local_id] = d;
+    GetNewMessageOnLoginList(single_message, true)
     input.value = ''
     const msgs = document.getElementById('message_list')
-    console.log("OKAY")
     msgs.scrollTop = msgs.scrollHeight;
 }
 
@@ -97,11 +127,20 @@ async function take_messages(usr, last) {
             loginPlace.textContent = data.name
             const photoPlace = document.getElementById('MessageListProfilePhoto')
             photoPlace.src = data.photo
-
+            let read_now = []
             for (let elem of data.messages) {
-                const dateTime = new Date(elem.create_date)
+
                 lastMessage = elem.id
-                print_forward(elem.user_from, elem.message, dateTime)
+                if (!elem.is_read && elem.user_from === usr) {
+                    read_now.push(elem.id)
+                }
+                print_forward(elem)
+            }
+            if (read_now.length > 0) {
+                ws.send(JSON.stringify({
+                    m_type: "read_message",
+                    ids: read_now
+                }));
             }
             if (data.messages.length < 10) {
                 const q = document.getElementById('early_href_div')
@@ -114,29 +153,38 @@ async function take_messages(usr, last) {
 // функция для обработки выбора чата
 function handleLoginClick(event, clickedElement) {
     event.preventDefault();
+
+    // показываем "загрузить ранние"
     const q = document.getElementById('early_href_div')
     if (q) {
         q.classList.remove('invisible')
     }
+
+    // снимаем активность с других кнопок и даем нужной
     const allLinks = document.querySelectorAll('.login_click');
     for (let i = 0; i < allLinks.length; i++) {
         allLinks[i].classList.remove("active")
     }
     clickedElement.classList.add("active")
+
+    // чистим старые сообщения
     while (output.firstChild) {
         output.removeChild(output.firstChild);
     }
 
+    // показываем блок с сообщениями
     let all_messages = document.getElementById('message_zero')
     if (all_messages) {
         all_messages.classList.remove("d-none")
     }
+
+    // скрываем блок с логинами на мобилке
     hideLogins()
 
     const strongElement = clickedElement.querySelector(".mb-1"); // Выбираем внутренний элемент с классом "mb-1"
     const user = strongElement.textContent; // Получаем текстовое содержимое элемента
 
-    single_message.recipient = user;
+    single_message.user_to = user;
     take_messages(user, 0)
 }
 
@@ -148,9 +196,9 @@ function get_logins_messages(logins_on) {
         mgs_div.classList.add('invisible')
         logins_div.classList.remove('invisible')
     } else {
-        setTimeout(function() {
-        mgs_div.classList.remove('invisible')
-        logins_div.classList.add('invisible')
+        setTimeout(function () {
+            mgs_div.classList.remove('invisible')
+            logins_div.classList.add('invisible')
         }, 100)
     }
 }
@@ -169,6 +217,7 @@ function HandleLoginSearchClick(login) {
         const container = document.getElementById('messagesList');
         const message = createLoginMessage(messageData);
         container.prepend(message);
+        handleLoginClick(event, message)
     }
 }
 
@@ -178,9 +227,10 @@ function add_login(login) {
     const newLink = document.createElement('a');
     // newLink.href = '/';
     newLink.className = 'list-group-item list-group-item-action py-3 lh-sm';
-    newLink.addEventListener("click", function(event) {
+    newLink.addEventListener("click", function (event) {
         event.preventDefault();
-        HandleLoginSearchClick(login)})
+        HandleLoginSearchClick(login)
+    })
     // Создаем новый элемент "strong"
     const strongElement = document.createElement('strong');
     strongElement.textContent = login; // Задаем содержимое для "strong"
@@ -196,13 +246,17 @@ function createLoginMessage(data) {
     const aTag = document.createElement('a');
     aTag.href = '#';
     aTag.classList.add('list-group-item', 'list-group-item-action', 'py-3', 'lh-sm', 'login_click');
-    aTag.addEventListener("click", function(event) {
+    aTag.addEventListener("click", function (event) {
         event.preventDefault();
         handleLoginClick(event, this);
     });
 
     const div1 = document.createElement('div');
     div1.classList.add('d-flex', 'w-100', 'align-items-center', 'justify-content-between');
+
+    const unread = document.createElement('span');
+    unread.classList.add('top-100', 'start-50', 'badge', 'translate-middle', 'bg-danger', 'rounded-pill', 'd-none');
+    unread.textContent = '0';
 
     const strong = document.createElement('strong');
     strong.classList.add('mb-1');
@@ -213,6 +267,7 @@ function createLoginMessage(data) {
     small.textContent = data.create_date.toString();
 
     div1.appendChild(strong);
+    div1.appendChild(unread);
     div1.appendChild(small);
 
     const div2 = document.createElement('div');
@@ -224,7 +279,6 @@ function createLoginMessage(data) {
 
     return aTag;
 }
-
 
 // функция для получения логинов из базы данных и формирования списка
 function take_logins() {
@@ -262,11 +316,25 @@ function hideLogins() {
         all_messages.classList.add('d-none')
     } else {
         logins.classList.add('d-none')
-
     }
 }
 
+// функция для управления количеством непрочитанных
+function changeUnreadCount(login, count) {
+    const loginElement = getFromCurrentLogin(login);
+    const smallElement = loginElement.querySelector('span');
+    let c = parseInt(smallElement.textContent)
+    smallElement.textContent = String(c + count)
+    if (c + count === 0) {
+        smallElement.classList.add('d-none')
+    } else {
+        smallElement.classList.remove('d-none')
+    }
+
+}
+
 function dateTimeValidation(dateTime) {
+    dateTime = new Date(dateTime)
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const month = String(dateTime.getMonth() + 1);
     const day = String(dateTime.getDate());
@@ -281,27 +349,63 @@ function dateTimeValidation(dateTime) {
     ) {
         formatDate = `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
     } else {
-        formatDate = `${day.padStart(2, '0')} ${months[month-1]}`;
+        formatDate = `${day.padStart(2, '0')} ${months[month - 1]}`;
     }
-    console.log(formatDate)
     return formatDate
+}
+
+
+function GetNewMessageOnLoginList(struct, to=false) {
+    let elem;
+    if (!to) {
+        elem = getFromCurrentLogin(struct.user_from)
+    } else {
+        elem = getFromCurrentLogin(struct.user_to)
+    }
+    const unread = parseInt(elem.querySelector("span").innerText);
+    const is_active = elem.classList.contains("active")
+    if (elem) {
+        elem.remove()
+    }
+    const messageData = {
+        user: struct.user_from,
+        create_date: dateTimeValidation(new Date()),
+        message: struct.message
+    };
+    const newElem = createLoginMessage(messageData)
+    if (is_active) {
+        newElem.classList.add("active")
+    }
+    const q = document.getElementById("messagesList");
+    q.prepend(newElem)
+    if (!to) {
+        changeUnreadCount(struct.user_from, unread + 1)
+    }
+}
+
+function MarkAsRead(id) {
+    const elem = document.querySelector(`[data-message-id="${id}"]`)
+    if (elem) {
+        elem.classList.remove("unread")
+    }
 }
 
 const links = document.querySelectorAll(".login_click");
 links.forEach((link) => {
-    link.addEventListener("click", function(event) {
+    link.addEventListener("click", function (event) {
         event.preventDefault();
         handleLoginClick(event, this);
     });
 });
 
 const myInput = document.getElementById("loginsSearch");
-myInput.addEventListener("focus", function() {
+myInput.addEventListener("focus", function () {
     console.log("Поле ввода получило фокус!");
     get_logins_messages(true)
     take_logins()
 });
-myInput.addEventListener("blur", function() {
+
+myInput.addEventListener("blur", function () {
     console.log("Поле ввода потеряло фокус!");
     get_logins_messages(false)
 });
@@ -312,9 +416,7 @@ toggleButton.addEventListener('click', function () {
 });
 
 const earlySearch = document.getElementById("early_href");
-earlySearch.addEventListener("click", function(event) {
+earlySearch.addEventListener("click", function (event) {
     event.preventDefault();
-    take_messages(single_message.recipient, lastMessage);
+    take_messages(single_message.user_to, lastMessage);
 })
-
-

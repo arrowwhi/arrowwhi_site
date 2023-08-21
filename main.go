@@ -60,6 +60,7 @@ func main() {
 	e.POST("/feedback/add", handlers.TakeFeedback)
 	e.POST("/database/get_logins", handlers.GetLogins)
 	e.POST("/profile/change_photo", handlers.ChangeProfilePhoto)
+	//e.POST("/chat/make_read", handlers.MessagesMakeRead)
 
 	e.Logger.Fatal(e.Start(os.Getenv("STANDARTPORT")))
 

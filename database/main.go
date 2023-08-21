@@ -15,7 +15,7 @@ var db *DbEngine
 func Get() *DbEngine {
 	if db == nil {
 		db = &DbEngine{}
-		go db.processQueue()
+		//go db.processQueue()
 	}
 	return db
 }
