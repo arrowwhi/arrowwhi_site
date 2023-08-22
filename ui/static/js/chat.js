@@ -153,6 +153,10 @@ async function take_messages(usr, last) {
 // функция для обработки выбора чата
 function handleLoginClick(event, clickedElement) {
     event.preventDefault();
+    // if (clickedElement.classList.contains("active")) {
+    //     console.log("Already active");
+    //     return
+    // }
 
     // показываем "загрузить ранние"
     const q = document.getElementById('early_href_div')

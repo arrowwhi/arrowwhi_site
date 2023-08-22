@@ -6,11 +6,18 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"log"
+	"net/http"
 	"site/auth"
 	"site/database"
 )
 
-var upgrader = websocket.Upgrader{} // use default options
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true // Настройте настоящую проверку, если это необходимо
+	},
+}
 
 var connects = make(map[string]*websocket.Conn)
 

@@ -64,7 +64,7 @@ func ChatTemplateHandler(c echo.Context) error {
 	data := map[string]interface{}{
 		"title":     "Чат",
 		"LoginInfo": username,
-		"chatId":    "ws://" + c.Request().Host + "/chat_s",
+		"chatId":    "wss://" + c.Request().Host + "/chat/web_socket",
 		"logins":    logins,
 	}
 

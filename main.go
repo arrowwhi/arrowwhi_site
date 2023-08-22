@@ -55,13 +55,13 @@ func main() {
 
 	//e.POST("/markdown", md.MarkdownHandler)
 	e.GET("/logout", handlers.LogoutHandler)
-	e.GET("/chat_s", chat.ChatHandler)
+	e.GET("/chat/web_socket", chat.ChatHandler)
 	e.POST("/database/get_messages", handlers.GetMessagesHistory)
 	e.POST("/feedback/add", handlers.TakeFeedback)
 	e.POST("/database/get_logins", handlers.GetLogins)
 	e.POST("/profile/change_photo", handlers.ChangeProfilePhoto)
 	//e.POST("/chat/make_read", handlers.MessagesMakeRead)
 
-	e.Logger.Fatal(e.Start(os.Getenv("STANDARTPORT")))
-
+	//e.Logger.Fatal(e.Start(os.Getenv("STANDARTPORT")))
+	e.Logger.Fatal(e.StartTLS(os.Getenv("STANDARTPORT"), os.Getenv("SERTFILE"), os.Getenv("KEYFILE")))
 }

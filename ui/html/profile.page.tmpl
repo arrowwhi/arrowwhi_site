@@ -88,7 +88,7 @@
         <h1>Настройки профиля</h1>
     </div>
     <div class="row">
-        <div class="col-lg-2 d-none d-lg-block pe-3 p-0"> <!-- Меню для больших экранов -->
+        <div class="col-lg-2 d-none d-lg-block p-0 border vh-100"> <!-- Меню для больших экранов -->
             <div class="bd-links w-100">
                 <button type="button" class="list-group-item list-group-item-action">Профиль</button>
                 <button type="button" class="list-group-item list-group-item-action">Сменить пароль</button>
@@ -120,15 +120,14 @@
                             <div class="mt-9">
                                 <div class="d-flex flex-row justify-content-between align-items-center flex-wrap">
                                     <label>
-                                        <input type="text" class="form-control mb-2 ms-1 nameChanger" placeholder="Имя" value="{{.FName}}" disabled>
+                                        <input type="text" class="form-control mb-2 nameChanger" placeholder="Имя" value="{{.FName}}" disabled>
                                     </label>
                                     <label>
-                                        <input type="text" class="form-control mb-2 ms-1 nameChanger" placeholder="Фамилия" value="{{.LName}}" disabled>
+                                        <input type="text" class="form-control mb-2 nameChanger" placeholder="Фамилия" value="{{.LName}}" disabled>
                                     </label>
                                     <button class="btn btn-primary mb-2 ms-1" id="ChangeName" onclick="PressChangeName()">Изменить</button>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
