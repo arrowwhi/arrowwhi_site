@@ -67,7 +67,7 @@ const print_forward = function (elem) {
     output.scroll(0, output.scrollHeight);
 };
 
-//проверка эвента на нажатую клаишу enter           - ?
+//проверка эвента на нажатую клаишу enter
 function checkEnter(evt) {
     if (event.key === "Enter") {
         event.preventDefault();
@@ -87,7 +87,6 @@ function press_send() {
         return;
     }
     console.log(`user user_to: ${single_message.user_to}`)
-
 
     single_message.create_date = new Date().toISOString();
     // TODO поправить формированиие локал ид
@@ -140,7 +139,8 @@ async function take_messages(usr, last) {
                 ws.send(JSON.stringify({
                     m_type: "read_message",
                     ids: read_now
-                }));
+                }))
+                changeUnreadCount(usr, -read_now.length)
             }
             if (data.messages.length < 10) {
                 const q = document.getElementById('early_href_div')
@@ -383,10 +383,11 @@ function GetNewMessageOnLoginList(struct, to=false) {
     const q = document.getElementById("messagesList");
     q.prepend(newElem)
     if (!to) {
-        changeUnreadCount(struct.user_from, unread + 1)
+        changeUnreadCount(struct.user_from, 1)
     }
 }
 
+// пометить сообщение как прочитанное
 function MarkAsRead(id) {
     const elem = document.querySelector(`[data-message-id="${id}"]`)
     if (elem) {
