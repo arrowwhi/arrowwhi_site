@@ -78,27 +78,43 @@ func TakeAuthHandler(c echo.Context) error {
 
 	username := c.FormValue("username")
 	pass := c.FormValue("password")
+
 	client, err := database.Get().SelectClientByLogin(username)
 	if err != nil {
-		return c.String(http.StatusForbidden, err.Error())
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"status":       "error",
+			"error_reason": "database error",
+			"error":        err.Error(),
+		})
 	}
-	if client == nil || !ComparePassword(client.Password, pass) {
-		return c.String(http.StatusForbidden, "Неправильный логин или пароль")
+	if client == nil {
+		return c.JSON(http.StatusForbidden, map[string]interface{}{
+			"status":       "error",
+			"error-reason": "invalid login",
+		})
+	} else if !ComparePassword(client.Password, pass) {
+		return c.JSON(http.StatusForbidden, map[string]interface{}{
+			"status":       "error",
+			"error-reason": "invalid password",
+		})
 	}
-
 	// Создаем JWT токен
 	tokenString, err := createToken(username)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Failed to create token")
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"status":       "error",
+			"error-reason": "error when creating token",
+		})
 	}
-
 	// Устанавливаем куки с токеном в браузер
 	cookie := new(http.Cookie)
 	cookie.Name = "token"
 	cookie.Value = tokenString
 	cookie.Expires = time.Now().Add(24 * 7 * time.Hour)
 	c.SetCookie(cookie)
-	return c.String(http.StatusOK, "Login successful")
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"status": "success",
+	})
 }
 
 // TakeRegHandler регистрация пользователя

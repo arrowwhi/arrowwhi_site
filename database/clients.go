@@ -77,7 +77,9 @@ func (dbe *DbEngine) GetLoginsToLine(login string) []map[string]interface{} {
 		"            where user_from = '%s') as mgs "+
 		"      group by usr) as uniq_usrs "+
 		"         join messages m on m.id = uniq_usrs.max_id "+
-		"        left join unread ur on ur.\"user\" = uniq_usrs.usr;", login, login, login, login, login)
+		"        left join unread ur on ur.\"user\" = uniq_usrs.usr;",
+		login, login, login, login, login)
+
 	var results []map[string]interface{}
 	dbe.db.Raw(query).Scan(&results)
 	for _, v := range results {

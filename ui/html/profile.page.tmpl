@@ -118,14 +118,11 @@
                                 <span class="hover-text">Изменить</span>
                             </div>
                             <div class="mt-9">
-                                <div class="d-flex flex-row justify-content-between align-items-center flex-wrap">
-                                    <label>
-                                        <input type="text" class="form-control mb-2 nameChanger" placeholder="Имя" value="{{.FName}}" disabled>
-                                    </label>
-                                    <label>
-                                        <input type="text" class="form-control mb-2 nameChanger" placeholder="Фамилия" value="{{.LName}}" disabled>
-                                    </label>
-                                    <button class="btn btn-primary mb-2 ms-1" id="ChangeName" onclick="PressChangeName()">Изменить</button>
+                                <h4>Имя и фамилия</h4>
+                                <div class="d-flex flex-row justify-content-between align-items-center flex-wrap input-group">
+                                    <input type="text" class="form-control mt-2 nameChanger" placeholder="Имя" value="{{.FName}}" disabled>
+                                    <input type="text" class="form-control mt-2 nameChanger" placeholder="Фамилия" value="{{.LName}}" disabled>
+                                    <button class="btn btn-primary mt-2" id="ChangeName" onclick="PressChangeName()">Изменить</button>
                                 </div>
                             </div>
                         </div>

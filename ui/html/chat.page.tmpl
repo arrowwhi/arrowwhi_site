@@ -39,8 +39,8 @@
     }
 
     .chat_input {
-        width: 90%;
-        margin-right: 10px;
+        /*width: 90%;*/
+        /*margin-right: 10px;*/
     }
 
     .chat_button {
@@ -50,59 +50,45 @@
 
     .message_list {
         overflow-y: auto;
-        max-height: 60vh;
+        max-height: 70vh;
     }
 
-    #messagesList.scrollarea {
-        max-height: 84vh;
-        overflow-y: auto;
-    }
-
-</style>
-
-<style>
-    .table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .table th,
-    .table td {
-        padding: 5px;
-    }
-
-    .table tr.unread {
-        border: #cccccc 0;
-        background-color: #c9c9c9;
-    }
-
-    .table th:first-child,
-    .table td:first-child,
-    .table th:nth-child(2),
-    .table td:nth-child(2) {
-        text-align: left;
-    }
-
-    .table th:last-child,
-    .table td:last-child {
-        text-align: right;
-    }
-
-    .table th:first-child,
-    .table th:last-child {
-        width: 100px;
-    }
-
-    .table th:nth-child(3),
-    .table td:nth-child(3) {
-        width: 70px;
-    }
 
     .invisible {
         height: 0;
     }
 
+    .profile-photo {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .table td:nth-child(1) {
+        width: 100%;
+        text-align: left;
+    }
+
+    .table td:nth-child(2),
+    .table td:nth-child(3){
+        text-align: end;
+        align-items: end;
+
+    }
+
+    .table td:nth-child(3) {
+        min-width: 70px;
+    }
+
+    .message_photo {
+        max-width: 20px;
+        max-height: 20px;
+    }
+
 </style>
+
 
 <audio id="sound">
     <source src="/sounds/message_alarm.mp3" type="audio/mpeg">
@@ -142,14 +128,30 @@
         </div>
         <div class="active_zone mt-auto">
         <div id="early_href_div" class="invisible"><a href="#" id="early_href">Загрузить ранние...</a></div>
-            <div class="message_list table-responsive d-flex flex-column scrollarea">
-                <table class="table" id="message_list">
-                    <tr>
-                        <th> </th>
-                        <td>Выберите пользователя для начала чата</td>
-                        <td> </td>
-                    </tr>
-                </table>
+            <div class="message_list table-responsive d-flex flex-column scrollarea" id="message_list">
+                <div class="single d-flex align-items-start ">
+                    <div class="d-inline h-100 left  justify-content-end position-relative p-1">
+                        <div class="profile-photo" style="width: 50px;">
+                            <img src="profiles/default.jpg" alt="Photo" class="img-fluid position-absolute top-0 start-0"/>
+                        </div>
+                    </div>
+                    <div class="right flex-column w-100">
+                        <div class="d-flex right-block justify-content-start p-1">
+                            <strong>Имя Фамилия</strong>
+                        </div>
+                        <div class="right-block">
+                            <table class="table table-hover w-100">
+                                <tbody>
+                                    <tr>
+                                        <td>Сообщение</td>
+                                        <td><img src="/images/unread.png" alt="read" class="message_photo"></td>
+                                        <td>15:00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="input_container">
@@ -193,7 +195,7 @@
             if (struct.m_type === "take_id_from_local") {
                 if (struct.local_id in pendingResponses) {
                     const d = pendingResponses[struct.local_id]
-                    d.setAttribute('data-message-id', struct.id);
+                    d.attr('data-message-id', struct.id);
                     delete pendingResponses[struct.local_id];
                 }
             } else if (struct.m_type === "make_read") {

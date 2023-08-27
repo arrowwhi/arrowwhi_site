@@ -28,8 +28,11 @@
     <ul class="navbar-nav ml-auto">
       {{ if .LoginInfo }}
       <li class="nav-item">
-        <span class="nav-link">Вы вошли как <a href="/profile">{{.LoginInfo}}</a>.
-        </span></li>
+        <span class="nav-link"> Вы вошли как <strong>{{.LoginInfo}}</strong>.</span>
+      </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/profile">Профиль</a>
+        </li>
       <li class="nav-item">
         <a class="nav-link" href="/logout">Выйти</a>
       </li>

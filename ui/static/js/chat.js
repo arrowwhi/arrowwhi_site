@@ -14,33 +14,24 @@ let single_message = {
     "create_date": ""
 }
 
-// Функция для создания сообщения
-function createMessage(author, messageText, dateTime, read) {
-    const newRow = document.createElement("tr");
-    if (!read) {
-        newRow.classList.add("unread")
-    }
-    // Создание ячеек <th> и <td> для новой строки
-    const thCell = document.createElement("th");
-    thCell.textContent = author; // Здесь можно указать имя
-    const tdCell1 = document.createElement("td");
-    tdCell1.textContent = messageText; // Здесь можно указать сообщение
-    const tdCell2 = document.createElement("td");
-    tdCell2.textContent = dateTimeValidation(dateTime);
+let forward_author = ""
+let backward_author = ""
 
-    newRow.appendChild(thCell);
-    newRow.appendChild(tdCell1);
-    newRow.appendChild(tdCell2);
-
-    return newRow;
-}
+let forward_author_block
+let backward_author_block
 
 // функция для печати сообщений снизу
-const print = function (elem) {
-    const d = createMessage(elem.user_from, elem.message, elem.create_date, elem.is_read)
-    output.appendChild(d);
+function print(elem) {
+    const d = createSingleMessage(elem.message, elem.is_read, dateTimeValidation(elem.create_date))
+    if (elem.user_from !== backward_author) {
+        backward_author_block = createProfileBlock(elem.user_from, "/profiles/default.jpg")
+        backward_author = elem.user_from
+        $(output).append(backward_author_block)
+    }
+    $(backward_author_block).find("table").find("tbody").append(d)
+
     if (elem.id !== 0) {
-        d.setAttribute('data-message-id', elem.id);
+        d.attr('data-message-id', elem.id);
         ws.send(JSON.stringify({
             m_type: "read_message",
             ids: [elem.id]
@@ -53,21 +44,28 @@ const print = function (elem) {
 };
 
 // функция для печати сообщений сверху
-const print_forward = function (elem) {
-    const dateTime = new Date(elem.create_date)
-    const d = createMessage(elem.user_from, elem.message, dateTime, elem.is_read);
-    d.setAttribute('data-message-id', elem.id);
+function print_forward(elem) {
+    const dateTime = dateTimeValidation(new Date(elem.create_date))
+
+    const d = createSingleMessage(elem.message, elem.is_read, dateTime);
+    if (elem.user_from !== forward_author) {
+        forward_author_block = createProfileBlock(elem.user_from, "/profiles/default.jpg")
+        forward_author = elem.user_from
+        $(output).prepend(forward_author_block)
+    }
+    $(forward_author_block).find("table").find("tbody").prepend(d);
+
+    $(d).attr('data-message-id', elem.id)
     if (elem.user_from === single_message.user_to && !elem.is_read) {
         ws.send(JSON.stringify({
             m_type: "read_message",
             ids: [elem.id]
         }));
     }
-    output.prepend(d);
-    output.scroll(0, output.scrollHeight);
-};
+    output.scroll(0, 0);
+}
 
-//проверка эвента на нажатую клаишу enter
+//проверка эвента на нажатую клавишу enter
 function checkEnter(evt) {
     if (event.key === "Enter") {
         event.preventDefault();
@@ -153,10 +151,6 @@ async function take_messages(usr, last) {
 // функция для обработки выбора чата
 function handleLoginClick(event, clickedElement) {
     event.preventDefault();
-    // if (clickedElement.classList.contains("active")) {
-    //     console.log("Already active");
-    //     return
-    // }
 
     // показываем "загрузить ранние"
     const q = document.getElementById('early_href_div')
@@ -358,32 +352,35 @@ function dateTimeValidation(dateTime) {
     return formatDate
 }
 
-
-function GetNewMessageOnLoginList(struct, to=false) {
+// обновляет сообщение в списке логинов
+function GetNewMessageOnLoginList(struct, to = false) {
     let elem;
     if (!to) {
-        elem = getFromCurrentLogin(struct.user_from)
+        elem = getFromCurrentLogin(struct.user_from);
     } else {
-        elem = getFromCurrentLogin(struct.user_to)
+        elem = getFromCurrentLogin(struct.user_to);
     }
-    const unread = parseInt(elem.querySelector("span").innerText);
-    const is_active = elem.classList.contains("active")
+    const unread = parseInt($(elem).find("span").text());
+    const isActive = $(elem).hasClass("active");
     if (elem) {
-        elem.remove()
+        $(elem).remove();
     }
     const messageData = {
         user: struct.user_from,
         create_date: dateTimeValidation(new Date()),
         message: struct.message
     };
-    const newElem = createLoginMessage(messageData)
-    if (is_active) {
-        newElem.classList.add("active")
+    if (to) {
+        messageData.user = struct.user_to;
+        messageData.message = "Вы: " + messageData.message;
     }
-    const q = document.getElementById("messagesList");
-    q.prepend(newElem)
+    const newElem = createLoginMessage(messageData);
+    if (isActive) {
+        $(newElem).addClass("active");
+    }
+    $("#messagesList").prepend(newElem);
     if (!to) {
-        changeUnreadCount(struct.user_from, 1)
+        changeUnreadCount(struct.user_from, 1);
     }
 }
 
@@ -391,7 +388,9 @@ function GetNewMessageOnLoginList(struct, to=false) {
 function MarkAsRead(id) {
     const elem = document.querySelector(`[data-message-id="${id}"]`)
     if (elem) {
-        elem.classList.remove("unread")
+        var image = $(elem).find("img");
+
+        image.attr("src", "images/read.png");
     }
 }
 
@@ -425,3 +424,50 @@ earlySearch.addEventListener("click", function (event) {
     event.preventDefault();
     take_messages(single_message.user_to, lastMessage);
 })
+
+
+/////////////////////////////////////////////////
+
+function createProfileBlock(name, photoSrc) {
+    return $(`
+        <div class="single d-flex align-items-start">
+            <div class="d-inline h-100 left justify-content-end position-relative p-1">
+                <div class="profile-photo" style="width: 50px;">
+                    <img src="${photoSrc}" alt="Photo" class="img-fluid position-absolute top-0 start-0">
+                </div>
+            </div>
+            <div class="right flex-column w-100">
+                <div class="d-flex right-block justify-content-start p-1">
+                    <strong>${name}</strong>
+                </div>
+                <div class="right-block">
+                    <table class="table table-hover w-100">
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `);
+}
+
+function createSingleMessage(message, isRead, time) {
+    var row = $("<tr></tr>").addClass(isRead ? "read" : "");
+
+    var messageCell = $("<td></td>").text(message);
+
+    var readCell = $("<td></td>");
+    var readImg = $("<img>").attr("src", isRead ? "/images/read.png" : "/images/unread.png")
+        .attr("alt", "read")
+        .addClass("message_photo");
+    readCell.append(readImg);
+
+    var timeCell = $("<td></td>").text(time);
+
+    row.append(messageCell);
+    row.append(readCell);
+    row.append(timeCell);
+
+    return row;
+}
+
+

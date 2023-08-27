@@ -2,104 +2,52 @@
 
 {{define "main"}}
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f2f2f2;
-        justify-content: center;
-        align-items: center;
-    }
-
-    /*.registration-container {*/
-    /*    max-width: 400px;*/
-    /*    margin: 0 auto;*/
-    /*    padding: 40px;*/
-    /*    background-color: #ccc;*/
-    /*    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);*/
-    /*}*/
-
-    /*.registration-container h2 {*/
-    /*    text-align: center;*/
-    /*    margin-bottom: 30px;*/
-    /*}*/
-
-    /*.registration-container input[type="text"],*/
-    /*.registration-container input[type="password"] {*/
-    /*    width: 100%;*/
-    /*    padding: 10px;*/
-    /*    margin-bottom: 20px;*/
-    /*    border: 1px solid #ccc;*/
-    /*    border-radius: 4px;*/
-    /*    box-sizing: border-box;*/
-    /*}*/
-
-    /*.registration-container input[type="submit"] {*/
-    /*    width: 100%;*/
-    /*    padding: 10px;*/
-    /*    background-color: #4CAF50;*/
-    /*    color: #fff;*/
-    /*    border: none;*/
-    /*    border-radius: 4px;*/
-    /*    cursor: pointer;*/
-    /*    font-size: 16px;*/
-    /*}*/
-
-    /*.registration-container input[type="submit"]:hover {*/
-    /*    background-color: #45a049;*/
-    /*}*/
-
-    /*.registration-container p {*/
-    /*    text-align: center;*/
-    /*    margin-top: 20px;*/
-    /*}*/
     .main {
-        padding-top: 0px;
+        padding-top: 0;
         display: flex;
         justify-content: center;
         align-items: center;
         height: 100vh;
+        /*width: 75vh;*/
     }
-    .registration-container {
-        padding: 40px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        border-radius: 10px;
-    }
+
 </style>
-    <form class="needs-validation" novalidate="" action="/reg" method="post" onsubmit="return validateForm()">
+    <div class="m-4" style="display: block; max-width: 800px">
+    <form class="needs-validation" novalidate="" action="/reg" method="post" onsubmit="{return validateForm(event)}">
+        <h1 class="mb-5">Регистрация</h1>
+
         <div class="row g-3">
-            <div class="col-sm-6">
-                <label for="fName" class="form-label">Имя</label>
-                <input type="text" class="form-control" id="fName" name="fName" placeholder="Ваня" value="" required="">
+            <div class="col-sm-6 form-floating">
+                <input type="text" class="form-control" id="fName" name="fName" placeholder="Ваня" value="" required>
+                <label for="fName" class="form-label">Имя*</label>
                 <div class="invalid-feedback">
                     Введите имя
                 </div>
             </div>
-            <div class="col-sm-6">
+            <div class="col-sm-6 form-floating">
+                <input type="text" class="form-control" id="lName" name="lName" placeholder="Ванин" required>
                 <label for="lName" class="form-label">Фамилия</label>
-                <input type="text" class="form-control" id="lName" name="lName" placeholder="Ванин" value="" required="">
                 <div class="invalid-feedback">
                     Введите фамилию
                 </div>
             </div>
-            <div class="col-12">
-                <label for="username" class="form-label">Логин</label>
-                <div class="input-group has-validation">
-                    <span class="input-group-text">@</span>
-                    <input type="text" class="form-control" name="login" id="username" placeholder="Username" required="">
-                    <div class="invalid-feedback">
-                        Логин уже занят
-                    </div>
+            <div class="col-12 form-floating">
+                <input type="text" class="form-control" name="login" id="username" placeholder="Username" required>
+                <label for="username" class="form-label">Логин*</label>
+                <div class="invalid-feedback">
+                    Логин может содержать только английские буквы, цифры, нижнее подчеркивание и тире
                 </div>
             </div>
-            <div class="col-12">
-                <label for="address" class="form-label">Пароль</label>
-                <input type="password" class="form-control" name="password" id="address" placeholder="Не меньше 8 символов" required="">
+            <div class="col-12 form-floating">
+                <input type="password" class="form-control" name="password" id="password" placeholder="Не меньше 8 символов" required>
+                <label for="password" class="form-label">Пароль*</label>
                 <div class="invalid-feedback">
                     Пароль должен содержать не меньше 8 символов
                 </div>
             </div>
-            <div class="col-12">
-                <label for="confirmPassword" class="form-label">Пароль <span class="text-body-secondary">(повторно)</span></label>
-                <input type="password" class="form-control" id="confirmPassword" required="">
+            <div class="col-12 form-floating">
+                <input type="password" class="form-control" id="confirmPassword" placeholder="Не меньше 8 символов" required>
+                <label for="confirmPassword" class="form-label">Пароль (повторно)*</label>
                 <div class="invalid-feedback">
                     Пароли не совпадают!
                 </div>
@@ -111,37 +59,51 @@
 
         <button class="w-100 btn btn-primary btn-lg" type="submit">Зарегистрироваться</button>
     </form>
+    </div>
 </div>
 <script>
     function validateForm() {
-        const fname = document.getElementById('fName').value;
-        const lname = document.getElementById('lName').value;
-        console.log(fname, lname)
-        const login = document.getElementById('login').value;
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
+        let out = true;
+        // event.preventDefault();
+
+        const fname = document.getElementById('fName');
+        const lname = document.getElementById('lName');
+        const login = document.getElementById('username');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirmPassword');
         const loginPattern = /^[A-Za-z0-9_-]+$/;
 
-        // Проверка логина
-        if (!loginPattern.test(login)) {
-            document.getElementById('loginError').innerText = "Логин может содержать только английские буквы, цифры, нижнее подчеркивание и тире.";
-            return false;
+        if (fname.value.length === 0) {
+            document.getElementById('fName').classList.add('is-invalid');
+            out = false
         } else {
-            document.getElementById('loginError').innerText = "";
+            document.getElementById('fName').classList.remove('is-invalid');
         }
 
-        // Проверка пароля
-        if (password.length < 8) {
-            document.getElementById('passwordError').innerText = "Пароль должен содержать минимум 8 символов.";
-            return false;
-        } else if (password !== confirmPassword) {
-            document.getElementById('passwordError').innerText = "Пароли не совпадают.";
-            return false;
+
+        if (login.value.length ===0 || !loginPattern.test(login.value)) {
+            document.getElementById('username').classList.add('is-invalid');
+            out = false
         } else {
-            document.getElementById('passwordError').innerText = "";
+            document.getElementById('username').classList.remove('is-invalid');
         }
 
-        return true;
+        if (password.value.length < 8) {
+            document.getElementById('password').classList.add('is-invalid');
+            out = false
+        } else {
+            document.getElementById('password').classList.remove('is-invalid');
+        }
+
+        if (password.value !== confirmPassword.value) {
+            document.getElementById('confirmPassword').classList.add('is-invalid');
+            out = false
+        } else {
+            document.getElementById('confirmPassword').classList.remove('is-invalid');
+        }
+
+
+        return out;
     }
 </script>
 {{end}}
