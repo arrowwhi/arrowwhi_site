@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"log"
+	"net/http"
 	"os"
 	"site/chat"
 	"site/handlers"
@@ -61,6 +62,17 @@ func main() {
 	e.POST("/database/get_logins", handlers.GetLogins)
 	e.POST("/profile/change_photo", handlers.ChangeProfilePhoto)
 	//e.POST("/chat/make_read", handlers.MessagesMakeRead)
+
+	e.POST("test/post", func(c echo.Context) error {
+		var responseData map[string]interface{}
+		if err := c.Bind(&responseData); err != nil {
+			return err
+		}
+		for i, v := range responseData {
+			fmt.Println(i, ": ", v)
+		}
+		return c.String(http.StatusOK, "Profile Page")
+	})
 
 	//e.Logger.Fatal(e.Start(os.Getenv("STANDARTPORT")))
 	e.Logger.Fatal(e.StartTLS(os.Getenv("STANDARTPORT"), os.Getenv("SERTFILE"), os.Getenv("KEYFILE")))
