@@ -64,12 +64,12 @@ func main() {
 	//e.POST("/chat/make_read", handlers.MessagesMakeRead)
 
 	e.POST("/test/post", func(c echo.Context) error {
-		var responseData map[string]interface{}
+		responseData := make(map[string]interface{})
 		if err := c.Bind(&responseData); err != nil {
 			return err
 		}
-		for i, v := range responseData {
-			fmt.Println(i, ": ", v)
+		for k, v := range responseData {
+			fmt.Println(k, ": ", v)
 		}
 		return c.String(http.StatusOK, "Profile Page")
 	})
