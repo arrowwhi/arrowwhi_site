@@ -63,7 +63,7 @@ func main() {
 	e.POST("/profile/change_photo", handlers.ChangeProfilePhoto)
 	//e.POST("/chat/make_read", handlers.MessagesMakeRead)
 
-	e.POST("test/post", func(c echo.Context) error {
+	e.POST("/test/post", func(c echo.Context) error {
 		var responseData map[string]interface{}
 		if err := c.Bind(&responseData); err != nil {
 			return err
