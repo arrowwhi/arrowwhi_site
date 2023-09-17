@@ -98,7 +98,7 @@ func ChangeProfilePhoto(c echo.Context) error {
 		return err
 	}
 
-	// Получаем файл из POST-запроса
+	// Получаем файл из запроса
 	file, err := c.FormFile("image")
 	if err != nil {
 		return c.String(http.StatusBadRequest, "Error reading the file")
@@ -136,6 +136,25 @@ func ChangeProfilePhoto(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status": "success",
 		"path":   dst.Name(),
+	})
+}
+
+func TakeUserLogins(c echo.Context) error {
+	var username = ""
+	cookie, err := c.Cookie("token")
+	if err == nil {
+		username, err = auth.VerifyAndExtractUsername(cookie.Value)
+		if err != nil {
+			log.Error(err.Error())
+			return err
+		}
+	} else {
+		return err
+	}
+	logins := database.Get().GetLoginsToLine(username)
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"status": "success",
+		"path":   logins,
 	})
 }
 

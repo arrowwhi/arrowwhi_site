@@ -41,7 +41,7 @@ function print(elem) {
     const msgs = document.getElementById('message_list')
     msgs.scrollTop = msgs.scrollHeight;
     return d
-};
+}
 
 // функция для печати сообщений сверху
 function print_forward(elem) {
@@ -65,16 +65,9 @@ function print_forward(elem) {
     output.scroll(0, 0);
 }
 
-//проверка эвента на нажатую клавишу enter
-function checkEnter(evt) {
-    if (event.key === "Enter") {
-        event.preventDefault();
-        press_send(evt)
-    }
-}
-
 // отправка сообщения на сервер
 function press_send() {
+    console.log("press_send")
     if (!ws) {
         console.log("No connection");
         return;
@@ -179,7 +172,8 @@ function handleLoginClick(event, clickedElement) {
     // скрываем блок с логинами на мобилке
     hideLogins()
 
-    const strongElement = clickedElement.querySelector(".mb-1"); // Выбираем внутренний элемент с классом "mb-1"
+    const strongElement = clickedElement.querySelector('strong')
+    console.log(strongElement)
     const user = strongElement.textContent; // Получаем текстовое содержимое элемента
 
     single_message.user_to = user;
@@ -203,80 +197,122 @@ function get_logins_messages(logins_on) {
 
 // функция для обработки выбора логина из поиска
 function HandleLoginSearchClick(login) {
-    let current_login = getFromCurrentLogin(login)
+    let current_login = $("#" + "" + login);
     if (current_login) {
         handleLoginClick(event, current_login)
     } else {
         const messageData = {
             user: login,
             create_date: '',
-            message: ''
+            message: '',
+            unread:0
         };
-        const container = document.getElementById('messagesList');
+        // const container = document.getElementById('messagesList');
         const message = createLoginMessage(messageData);
-        container.prepend(message);
+        $("#messagesList").prepend(message);
         handleLoginClick(event, message)
     }
 }
 
 // функция для добавления логина в список логинов при поиске
+// function add_login(login) {
+//     const newLink = document.createElement('a');
+//     newLink.className = 'list-group-item list-group-item-action py-3 lh-sm';
+//
+//     newLink.addEventListener("click", function (event) {
+//         event.preventDefault();
+//         HandleLoginSearchClick(login)
+//     })
+//     const strongElement = document.createElement('strong');
+//     strongElement.textContent = login; // Задаем содержимое для "strong"
+//     newLink.appendChild(strongElement);
+//     const loginsList = document.getElementById('loginsList');
+//     loginsList.appendChild(newLink);
+// }
+
+
 function add_login(login) {
-    // Создаем новый элемент "a"
-    const newLink = document.createElement('a');
-    // newLink.href = '/';
-    newLink.className = 'list-group-item list-group-item-action py-3 lh-sm';
-    newLink.addEventListener("click", function (event) {
-        event.preventDefault();
-        HandleLoginSearchClick(login)
-    })
-    // Создаем новый элемент "strong"
-    const strongElement = document.createElement('strong');
-    strongElement.textContent = login; // Задаем содержимое для "strong"
-    newLink.appendChild(strongElement);
-    const loginsList = document.getElementById('loginsList');
-    // Добавляем новый "a" внутрь блока с id "loginsList"
-    loginsList.appendChild(newLink);
-}
+    const $newLink = $("<a>").addClass('list-group-item list-group-item-action py-3 lh-sm')
+        .attr('id', "login_"+login)
 
-
-// функция для создания структуры тегов для логина с сообщениями
-function createLoginMessage(data) {
-    const aTag = document.createElement('a');
-    aTag.href = '#';
-    aTag.classList.add('list-group-item', 'list-group-item-action', 'py-3', 'lh-sm', 'login_click');
-    aTag.addEventListener("click", function (event) {
+    $newLink.on("click", function (event) {
         event.preventDefault();
-        handleLoginClick(event, this);
+        console.log("add_login_click")
+        HandleLoginSearchClick(login);
     });
 
-    const div1 = document.createElement('div');
-    div1.classList.add('d-flex', 'w-100', 'align-items-center', 'justify-content-between');
+    const $strongElement = $("<strong>").text(login);
+    $newLink.append($strongElement);
 
-    const unread = document.createElement('span');
-    unread.classList.add('top-100', 'start-50', 'badge', 'translate-middle', 'bg-danger', 'rounded-pill', 'd-none');
-    unread.textContent = '0';
-
-    const strong = document.createElement('strong');
-    strong.classList.add('mb-1');
-    strong.textContent = data.user;
-
-    const small = document.createElement('small');
-    small.classList.add('text-body-secondary');
-    small.textContent = data.create_date.toString();
-
-    div1.appendChild(strong);
-    div1.appendChild(unread);
-    div1.appendChild(small);
-
-    const div2 = document.createElement('div');
-    div2.classList.add('col-10', 'mb-1', 'small');
-    div2.textContent = data.message;
-
-    aTag.appendChild(div1);
-    aTag.appendChild(div2);
-
-    return aTag;
+    $("#loginsList").append($newLink);
 }
+
+// функция для создания структуры тегов для логина с последним сообщением
+function createLoginMessage(data) {
+    console.log("createLoginMessage")
+    return $(`
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="login_click d-flex align-items-start list-group-item list-group-item-action">
+        <div class="d-inline h-100 left  justify-content-end position-relative p-1">
+            <div class="profile-photo">
+                <img src="/profiles/default.jpg" alt="Photo" class="img-fluid position-absolute top-0 start-0"/>
+            </div>
+        </div>
+        <div class="right flex-column w-100">
+            <div class="d-flex right-block justify-content-between p-1">
+                <div id="login_${data.user}">
+                    <strong>${data.user}</strong> 
+                    <span class="badge text-bg-danger">${data.unread}</span>
+                </div>
+                <div class="p-1">${data.create_date.toString()}</div>
+            </div>
+            <div class="align-content-start">
+                ${data.message}
+            </div>
+        </div>
+    </div>
+</div>
+    `)
+}
+
+// // функция для создания структуры тегов для логина с сообщениями
+// function createLoginMessage(data) {
+//     const aTag = document.createElement('a');
+//     aTag.href = '#';
+//     aTag.classList.add('list-group-item', 'list-group-item-action', 'py-3', 'lh-sm', 'login_click');
+//     aTag.addEventListener("click", function (event) {
+//         event.preventDefault();
+//         handleLoginClick(event, this);
+//     });
+//
+//     const div1 = document.createElement('div');
+//     div1.classList.add('d-flex', 'w-100', 'align-items-center', 'justify-content-between');
+//
+//     const unread = document.createElement('span');
+//     unread.classList.add('top-100', 'start-50', 'badge', 'translate-middle', 'bg-danger', 'rounded-pill', 'd-none');
+//     unread.textContent = '0';
+//
+//     const strong = document.createElement('strong');
+//     strong.classList.add('mb-1');
+//     strong.textContent = data.user;
+//
+//     const small = document.createElement('small');
+//     small.classList.add('text-body-secondary');
+//     small.textContent = data.create_date.toString();
+//
+//     div1.appendChild(strong);
+//     div1.appendChild(unread);
+//     div1.appendChild(small);
+//
+//     const div2 = document.createElement('div');
+//     div2.classList.add('col-10', 'mb-1', 'small');
+//     div2.textContent = data.message;
+//
+//     aTag.appendChild(div1);
+//     aTag.appendChild(div2);
+//
+//     return aTag;
+// }
 
 // функция для получения логинов из базы данных и формирования списка
 function take_logins() {
@@ -328,7 +364,6 @@ function changeUnreadCount(login, count) {
     } else {
         smallElement.classList.remove('d-none')
     }
-
 }
 
 function dateTimeValidation(dateTime) {
@@ -354,6 +389,7 @@ function dateTimeValidation(dateTime) {
 
 // обновляет сообщение в списке логинов
 function GetNewMessageOnLoginList(struct, to = false) {
+    console.log("GetNewMessageOnLoginList")
     let elem;
     if (!to) {
         elem = getFromCurrentLogin(struct.user_from);
@@ -384,6 +420,7 @@ function GetNewMessageOnLoginList(struct, to = false) {
     }
 }
 
+
 // пометить сообщение как прочитанное
 function MarkAsRead(id) {
     const elem = document.querySelector(`[data-message-id="${id}"]`)
@@ -393,6 +430,36 @@ function MarkAsRead(id) {
         image.attr("src", "images/read.png");
     }
 }
+
+function getFirstLoginList() {
+    console.log("START2")
+
+    fetch("/chat/take_logins").then(response => response.json()).then(data => {
+        console.log("START3")
+
+        for (let elem of data.path) {
+            console.log("START4")
+
+            createLoginMessage(elem)
+        }
+    }).catch(error => console.error('Ошибка:', error));
+}
+
+$(document).ready(function() {
+    console.log("START")
+    getFirstLoginList()
+})
+
+// ---------------
+
+//проверка эвента на нажатую клавишу enter
+function checkEnter(evt) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        press_send(evt)
+    }
+}
+
 
 const links = document.querySelectorAll(".login_click");
 links.forEach((link) => {
@@ -428,7 +495,7 @@ earlySearch.addEventListener("click", function (event) {
 
 /////////////////////////////////////////////////
 
-function createProfileBlock(name, photoSrc) {
+function createProfileBlock(name, photoSrc, unread) {
     return $(`
         <div class="single d-flex align-items-start">
             <div class="d-inline h-100 left justify-content-end position-relative p-1">

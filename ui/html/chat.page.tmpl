@@ -50,9 +50,8 @@
 
     .message_list {
         overflow-y: auto;
-        max-height: 70vh;
+        max-height: 60vh;
     }
-
 
     .invisible {
         height: 0;
@@ -87,12 +86,27 @@
         max-height: 20px;
     }
 
+    .profile-photo {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .notification {
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        padding: 5px 10px;
+    }
+
 </style>
 
 
 <audio id="sound">
     <source src="/sounds/message_alarm.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
+    Your browser doesn't support the audio element.
 </audio>
 
 
@@ -101,21 +115,50 @@
         <form class="d-flex mt-3 mt-lg-0" role="search">
             <input id="loginsSearch" class="form-control me-2" type="search" placeholder="Search" aria-label="Search" data-toggle="dropdown">
         </form>
-        <div id="messagesList" class="list-group list-group-flush border-bottom scrollarea">
-        {{range .logins}}
-        <a href="#" class="list-group-item list-group-item-action py-3 lh-sm login_click col-12 col-md-6 ">
+        <div id="messagesList" class="list-group list-group-flush border-bottom scrollarea border">
+{{/*            {{range .logins}}*/}}
+{{/*            <div class="login_click d-flex align-items-start list-group-item list-group-item-action">*/}}
+{{/*                <div class="d-inline h-100 left justify-content-end position-relative p-1">*/}}
+{{/*                    <div class="profile-photo">*/}}
+{{/*                        <img src="/profiles/default.jpg" alt="Photo" class="img-fluid position-absolute top-0 start-0"/>*/}}
+{{/*                    </div>*/}}
+{{/*                </div>*/}}
+{{/*                <div class="right flex-column w-100">*/}}
+{{/*                    <div class="d-flex right-block justify-content-between p-1">*/}}
+{{/*                        <div>*/}}
+{{/*                            <strong>{{.user}} <span class="badge text-bg-danger">{{.unread}}</span></strong>*/}}
+{{/*                        </div>*/}}
+{{/*                        <div class="p-1">{{.create_date}}</div>*/}}
+{{/*                    </div>*/}}
+{{/*                    <div class="align-content-start">*/}}
+{{/*                        {{if (eq .rotation "from")}}<strong>Вы: </strong>{{end}}{{.message}}</div>*/}}
+{{/*                    </div>*/}}
+{{/*                </div>*/}}
+{{/*            {{end}}*/}}
 
-            <div class="d-flex w-100 align-items-center justify-content-between position-relative">
-                <strong class="mb-1">{{.user}}</strong>
-                <span class="top-100 start-50 translate-middle badge rounded-pill bg-danger {{if eq .unread 0}}d-none{{end}}">
-    {{.unread}}
-  </span>
-                <small class="text-body-secondary">{{.create_date}}</small>
+{{/*            <div class="container d-flex justify-content-center align-items-center vh-100">*/}}
+            <div class="login_click d-flex align-items-start list-group-item list-group-item-action">
+                <div class="d-inline h-100 left  justify-content-end position-relative p-1">
+                    <div class="profile-photo">
+                        <img src="/profiles/default.jpg" alt="Photo" class="img-fluid position-absolute top-0 start-0"/>
+                    </div>
+                </div>
+                <div class="right flex-column w-100">
+                    <div class="d-flex right-block justify-content-between p-1">
+                        <div>
+                            <strong>user</strong>
+                            <span class="badge notification">4</span>
+                        </div>
+                        <div class="p-1">data.create_date</div>
+                    </div>
+                    <div class="align-content-start">
+                        data.message
+                    </div>
+                </div>
             </div>
-            <div class="col-10 mb-1 small text-start">{{if (eq .rotation "from")}}<strong>Вы: </strong>{{end}}{{.message}}</div>
-        </a>
-        {{end}}
+{{/*            </div>*/}}
         </div>
+
         <div id="loginsList" class="list-group list-group-flush border-bottom scrollarea invisible">
         </div>
     </div>
@@ -129,29 +172,6 @@
         <div class="active_zone mt-auto">
         <div id="early_href_div" class="invisible"><a href="#" id="early_href">Загрузить ранние...</a></div>
             <div class="message_list table-responsive d-flex flex-column scrollarea" id="message_list">
-                <div class="single d-flex align-items-start ">
-                    <div class="d-inline h-100 left  justify-content-end position-relative p-1">
-                        <div class="profile-photo" style="width: 50px;">
-                            <img src="profiles/default.jpg" alt="Photo" class="img-fluid position-absolute top-0 start-0"/>
-                        </div>
-                    </div>
-                    <div class="right flex-column w-100">
-                        <div class="d-flex right-block justify-content-start p-1">
-                            <strong>Имя Фамилия</strong>
-                        </div>
-                        <div class="right-block">
-                            <table class="table table-hover w-100">
-                                <tbody>
-                                    <tr>
-                                        <td>Сообщение</td>
-                                        <td><img src="/images/unread.png" alt="read" class="message_photo"></td>
-                                        <td>15:00</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
         <div class="input_container">
@@ -223,4 +243,7 @@
 
     });
 </script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+
 {{end}}

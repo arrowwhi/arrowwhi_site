@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var queueMessages = make(chan Message, 100)
+//var queueMessages = make(chan Message, 100)
 
 type Message struct {
 	ID         uint      `json:"id" gorm:"primaryKey"`

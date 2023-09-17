@@ -61,7 +61,7 @@ func main() {
 	e.POST("/feedback/add", handlers.TakeFeedback)
 	e.POST("/database/get_logins", handlers.GetLogins)
 	e.POST("/profile/change_photo", handlers.ChangeProfilePhoto)
-	//e.POST("/chat/make_read", handlers.MessagesMakeRead)
+	e.GET("/chat/take_logins", handlers.TakeUserLogins)
 
 	e.POST("/test/post", func(c echo.Context) error {
 		responseData := make(map[string]interface{})

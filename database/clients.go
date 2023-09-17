@@ -57,28 +57,33 @@ func (dbe *DbEngine) GetLogins() ([]string, error) {
 }
 
 func (dbe *DbEngine) GetLoginsToLine(login string) []map[string]interface{} {
-	query := fmt.Sprintf("with unread as ("+
-		"select user_from as \"user\", count(*) as unread from messages "+
-		"where \"user_to\" = '%s' and is_read = false "+
-		"group by \"user_from\" "+
-		") "+
-		"select case when user_to = '%s' then 'to' else 'from' end as rotation, "+
-		"       case when user_to = '%s' then user_from else user_to end as \"user\", "+
-		"       message, "+
-		"       COALESCE(ur.unread, 0) AS unread, "+
-		"       create_date "+
-		"from (select usr, MAX(id) as max_id "+
-		"      from (select id, user_from as usr "+
-		"            from messages "+
-		"            where user_to = '%s' "+
-		"            union all "+
-		"            select id, user_to as usr "+
-		"            from messages "+
-		"            where user_from = '%s') as mgs "+
-		"      group by usr) as uniq_usrs "+
-		"         join messages m on m.id = uniq_usrs.max_id "+
-		"        left join unread ur on ur.\"user\" = uniq_usrs.usr;",
-		login, login, login, login, login)
+	query := fmt.Sprintf(
+		"    with unread as ("+
+			"		select user_from as \"user\", "+
+			"		count(*) as unread from messages"+
+			"		where \"user_to\" = '%s' and is_read = false"+
+			"		group by \"user_from\""+
+			"		)"+
+			"		select case when user_to = '%s' then 'to' else 'from' end as rotation,"+
+			"		       case when user_to = '%s' then user_from else user_to end as username,"+
+			"		       message,"+
+			"		       COALESCE(ur.unread, 0) AS unread,"+
+			"		       m.create_date,"+
+			"		       c.profile_photo"+
+			"		from (select usr, MAX(id) as max_id"+
+			"		      from (select id, user_from as usr"+
+			"		            from messages"+
+			"		            where user_to = '%s'"+
+			"		            union all"+
+			"		            select id, user_to as usr"+
+			"		            from messages"+
+			"		            where user_from = '%s') as mgs"+
+			"		      group by usr) as uniq_usrs"+
+			"		         join messages m on m.id = uniq_usrs.max_id"+
+			"		         left join unread ur on ur.\"user\" = uniq_usrs.usr"+
+			"    	left join clients c on case when user_to = '%s' then user_from else user_to end = c.login"+
+			"		order by create_date;",
+		login, login, login, login, login, login)
 
 	var results []map[string]interface{}
 	dbe.db.Raw(query).Scan(&results)
