@@ -2,10 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"log"
 	"net/http"
 	"os"
 	"site/chat"
@@ -18,10 +16,10 @@ import (
 func main() {
 	e := echo.New()
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Ошибка при загрузке файла .env:", err)
-	}
+	//err := godotenv.Load()
+	//if err != nil {
+	//	log.Fatal("Ошибка при загрузке файла .env:", err)
+	//}
 
 	dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s TimeZone=%s",
 		os.Getenv("DBUSERNAME"),
@@ -74,6 +72,6 @@ func main() {
 		return c.String(http.StatusOK, "Profile Page")
 	})
 
-	//e.Logger.Fatal(e.Start(os.Getenv("STANDARTPORT")))
-	e.Logger.Fatal(e.StartTLS(os.Getenv("STANDARTPORT"), os.Getenv("SERTFILE"), os.Getenv("KEYFILE")))
+	e.Logger.Fatal(e.Start(":8080"))
+	//e.Logger.Fatal(e.StartTLS(os.Getenv("STANDARTPORT"), os.Getenv("SERTFILE"), os.Getenv("KEYFILE")))
 }

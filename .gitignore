@@ -1,3 +1,5 @@
-/test/
-.env
-/ui/pages/
+*/test/
+src/.env
+*/ui/pages/
+
+.idea/
